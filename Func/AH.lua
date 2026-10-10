@@ -1,5 +1,5 @@
 local _,ns = ...
-ns.tips("按alt一次买一组,去除二次确认框")
+ns.tips("Hold Alt to buy a full stack at once and skip the confirmation dialog.")
 local savedMerchantItemButton_OnModifiedClick = MerchantItemButton_OnModifiedClick
 function MerchantItemButton_OnModifiedClick(self, ...)
 	if IsAltKeyDown() then
@@ -9,7 +9,7 @@ function MerchantItemButton_OnModifiedClick(self, ...)
 	savedMerchantItemButton_OnModifiedClick(self, ...)
 end
 
-ns.tips("拍卖行收藏夹会自动保存并恢复")
+ns.tips("Auction house favorites are saved and restored automatically.")
 local function CopyItemKey(itemKey)
 	if not itemKey then
 		return
@@ -31,7 +31,7 @@ local function GetItemKeyHash(itemKey)
 	return string.format("%d:%d:%d:%d", itemKey.itemID or 0, itemKey.itemLevel or 0, itemKey.itemSuffix or 0, itemKey.battlePetSpeciesID or 0)
 end
 
---拍卖行保存过滤AHFilterRestoreDB
+-- Auction house save filter: AHFilterRestoreDB
 local favoriteHooked
 local restoringFavorites
 local pendingRestore
@@ -90,11 +90,11 @@ local ahHooked
 local function OnAuctionHouseShow(event)
 	AddUIDB.AHFilterRestoreDB = AddUIDB.AHFilterRestoreDB or {}
 	AddUIDB.AHFavoritesDB = AddUIDB.AHFavoritesDB or {}
-	--设置拍卖行
+	-- Configure auction house
 	AuctionHouseFrame.SearchBar.FilterButton.filters = next(AddUIDB.AHFilterRestoreDB) and AddUIDB.AHFilterRestoreDB or
 	CopyTable(AUCTION_HOUSE_DEFAULT_FILTERS)
 	AuctionHouseFrame.SearchBar:UpdateClearFiltersButton()
-	--设置hook
+	-- Install hooks
 	if not ahHooked then
 		ns.hook(AuctionHouseFrame.SearchBar, "OnFilterToggled", function()
 			local newFilter = AuctionHouseFrame.SearchBar.FilterButton:GetFilters()
