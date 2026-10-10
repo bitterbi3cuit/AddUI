@@ -91,7 +91,7 @@ if event == "UPDATE_MOUSEOVER_UNIT" then
 	if types == "Pet" then return end;
 	if zoneID == nil then return end;
     if NoID[ids] then return end;
-	weimian:SetText("Plane: "..zoneID)
+	weimian:SetText("zone: "..zoneID)
 elseif event == "ZONE_CHANGED_NEW_AREA" then
 	weimian:SetText("")
 end
