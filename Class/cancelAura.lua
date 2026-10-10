@@ -1,8 +1,8 @@
-﻿local _,ns = ...
+local _,ns = ...
 
 local _, cls = UnitClass("player")
 
--- 法师：奥术涌动倒数提醒（设置-职业 开关 mageCountdown）
+-- Mage: Arcane Surge countdown alert (Settings - Class toggle mageCountdown)
 if cls == "MAGE" then
 	ns.event("PLAYER_LOGIN", function()
 		if not (AddUIDB and AddUIDB.mageCountdown) then return end
@@ -17,7 +17,7 @@ if cls == "MAGE" then
 			end)
 		end)
 	end)
--- 萨满：技能倒数提醒（设置-职业 开关 shamanCountdown）
+-- Shaman: ability countdown alert (Settings - Class toggle shamanCountdown)
 elseif cls == "SHAMAN" then
 	ns.event("PLAYER_LOGIN", function()
 		if not (AddUIDB and AddUIDB.shamanCountdown) then return end
@@ -33,14 +33,28 @@ elseif cls == "SHAMAN" then
 	end)
 end
 
+-- Alter Time
+local ALTER_TIME       = 342245   -- cast Alter Time
+local ALTER_TIME_ENDS  = 342247   -- Alter Time ends
 
-local needcancel = [[
-/cancelAura 操控时间
-]]
+-- The aura name is read from the client at runtime instead of being hardcoded, so the
+-- cancel macro matches on every locale (enUS "Alter Time", zhCN "操控时间", deDE "Zeitverschiebung", ...)
+local function GetAlterTimeName()
+	if C_Spell and C_Spell.GetSpellName then
+		local name = C_Spell.GetSpellName(ALTER_TIME)
+		if name then return name end
+	end
+	if GetSpellInfo then
+		local name = GetSpellInfo(ALTER_TIME)
+		if name then return name end
+	end
+	return "Alter Time"
+end
 
 local button
 
--- 法术警示动画交给暴雪的 ActionButtonSpellAlertManager：首次 ShowAlert 时自动创建模板框架并播放
+-- The spell-alert animation is delegated to Blizzard's ActionButtonSpellAlertManager:
+-- on the first ShowAlert it creates the template frame automatically and plays
 local function HideAura()
 	if not button then return end
 	button.text:Hide()
@@ -68,32 +82,34 @@ end
 
 local function CreateFrames()
 	if button then return end
+	-- secure attributes can only be set out of combat; retried from PLAYER_REGEN_ENABLED below
+	if InCombatLockdown() then return end
 
-	-- 主框架
+	-- main frame
 	local f = CreateFrame("Frame", "ADDUIcancelAuraButton", UIParent)
 	f:SetSize(60, 60)
 	f:SetPoint("TOP", UIParent, "TOP", 300, -10)
-	ns.AddEdit(f, "取消\n操控")
+	ns.AddEdit(f, "Cancel\nAlter Time")
 	button = f
 
-	-- 背景
+	-- background
 	f.Background = f:CreateTexture(nil, "BACKGROUND")
 	f.Background:SetTexture(130937)
 	f.Background:SetAllPoints(f)
 	f.Background:SetColorTexture(0, 0, 0, 0)
 
-	-- 悬停提示
+	-- hover tooltip text
 	f.tiptext = f:CreateFontString(nil, "BACKGROUND")
 	f.tiptext:SetFont(SystemFont_Outline_Small:GetFont(), 20, "OUTLINE")
 	f.tiptext:SetPoint("CENTER", f, "CENTER", 0, 0)
-	f.tiptext:SetText("取消\n操控")
+	f.tiptext:SetText("Cancel\nAlter Time")
 	f.tiptext:SetTextColor(0.5, 0.5, 0.5)
 	f.tiptext:Hide()
 
-	-- 安全取消按钮
+	-- secure cancel button
 	local btn = CreateFrame("CheckButton", "ADcancelAuraButton", f, "SecureActionButtonTemplate")
 	btn:SetAttribute("type", "macro")
-	btn:SetAttribute("macrotext", needcancel)
+	btn:SetAttribute("macrotext", "/cancelaura " .. GetAlterTimeName())
 	btn:SetAllPoints(f)
 	btn:RegisterForClicks("AnyDown", "AnyUp")
 	btn:SetScript("OnEnter", function()
@@ -104,9 +120,9 @@ local function CreateFrames()
 		f.Background:SetColorTexture(0, 0, 0, 0)
 		f.tiptext:Hide()
 	end)
-	btn:HookScript("OnClick", HideAura)  -- 保留模板安全 OnClick 执行取消宏，再隐藏按钮
+	btn:HookScript("OnClick", HideAura)  -- keep the template's secure OnClick to run the cancel macro, then hide the button
 
-	-- 子按钮覆盖父框架拦截拖动 → 编辑模式下让子按钮也响应拖动
+	-- the child button covers the parent frame and intercepts dragging -> in edit mode let the child respond to drags too
 	local function ToggleChildDrag()
 		if InCombatLockdown() then return end
 		local inEditMode = EditModeManagerFrame and EditModeManagerFrame:IsShown()
@@ -127,24 +143,26 @@ local function CreateFrames()
 			btn:SetScript("OnDragStop", nil)
 		end
 	end
-	EditModeManagerFrame:HookScript("OnShow", ToggleChildDrag)
-	EditModeManagerFrame:HookScript("OnHide", ToggleChildDrag)
+	if EditModeManagerFrame then
+		EditModeManagerFrame:HookScript("OnShow", ToggleChildDrag)
+		EditModeManagerFrame:HookScript("OnHide", ToggleChildDrag)
+	end
 	ToggleChildDrag()
 
-	-- 操控时间图标
+	-- Alter Time icon
 	f.T = f:CreateTexture()
 	f.T:SetAllPoints(f)
 	f.T:SetTexture(985088)
 	f.T:SetTexCoord(0.07, 0.93, 0.07, 0.93)
 	f.T:Hide()
 
-	-- 血量百分比
+	-- health percentage
 	f.text = f:CreateFontString(nil)
 	f.text:SetFont(SystemFont_Outline_Small:GetFont(), 30, "OUTLINE")
 	f.text:SetPoint("TOP", f, "BOTTOM", 0, 0)
 	f.text:Hide()
 
-	-- 冷却（10 秒转圈）
+	-- cooldown (10-second sweep)
 	f.Cooldown = CreateFrame("Cooldown", nil, f, "CooldownFrameTemplate")
 	f.Cooldown:SetAllPoints(f.T)
 	f.Cooldown:SetHideCountdownNumbers(false)
@@ -153,7 +171,8 @@ local function CreateFrames()
 	f.Cooldown:SetScript("OnCooldownDone", function()
 		HideAura()
 	end)
-	-- 用 GetCountdownFontString() 取倒计时 FontString，别用 GetRegions()[1]（第一项可能是 cooldown 自带贴图，会静默跳过）
+	-- use GetCountdownFontString() to get the countdown FontString, not GetRegions()[1]
+	-- (the first entry may be the cooldown's own texture and would be skipped silently)
 	local cdText = f.Cooldown:GetCountdownFontString()
 	if cdText then
 		cdText:SetFont(STANDARD_TEXT_FONT, 30, "OUTLINE")
@@ -168,9 +187,9 @@ local function OnCancelAuraEvent(event, unit, _, spellId)
 	end
 	if unit ~= "player" then return end
 
-	if spellId == 342245 then      -- 施放操控时间 → 显示
+	if spellId == ALTER_TIME then          -- cast Alter Time -> show
 		ShowAura()
-	elseif spellId == 342247 then  -- 操控时间结束 → 隐藏
+	elseif spellId == ALTER_TIME_ENDS then -- Alter Time ends -> hide
 		HideAura()
 	end
 end
@@ -178,7 +197,6 @@ end
 if cls == "MAGE" then
 	ns.event('PLAYER_ENTERING_WORLD', OnCancelAuraEvent)
 	ns.event('UNIT_SPELLCAST_SUCCEEDED', OnCancelAuraEvent)
+	-- if PLAYER_ENTERING_WORLD fired while in combat, finish the setup once combat ends
+	ns.event('PLAYER_REGEN_ENABLED', CreateFrames)
 end
-
-
-
