@@ -1,13 +1,13 @@
 local _,ns = ...
 ns.event("PLAYER_LOGIN", function()
 if AddUIDB.mh ==  true  then
---自动卖灰
+-- Automatically sell junk (grey items)
 ns.event("MERCHANT_SHOW", function() 
 	local p,N,c,n=0
 		for b=0,4 do
 		    for s=1,C_Container.GetContainerNumSlots (b) do
 			    n=C_Container.GetContainerItemLink(b,s)--https://warcraft.wiki.gg/wiki/UI_escape_sequences 
-                    if n and string.find(n,"|cnIQ0") then--9d9d9d--Q0灰色123456---https://warcraft.wiki.gg/wiki/Enum.ItemQuality
+                    if n and string.find(n,"|cnIQ0") then--9d9d9d--Q0 grey 123456---https://warcraft.wiki.gg/wiki/Enum.ItemQuality
 					    N={C_Item.GetItemInfo(n)} 
                         c=C_Item.GetItemCount(n)
 						p= p+(N[11]*c)
@@ -17,38 +17,38 @@ ns.event("MERCHANT_SHOW", function()
 		end 
 		--C_MerchantFrame.SellAllJunkItems()
     if p ~= 0 then
-	    print("|cff44CCFF售卖垃圾: |r"..C_CurrencyInfo.GetCoinText(p))
+	    print("|cff44CCFFJunk sold: |r"..C_CurrencyInfo.GetCoinText(p))
 	end
 end)
 end
 
---NPC一键售卖按钮装备
---需要过滤的装备
+-- One-click NPC sell button for equipment
+-- Equipment to exclude from selling
 local nosell = {
-	[63352] = true,--协作披风
-	[63206] = true,--协和披风
-	[65360] = true,--协同披风
-	[63353] = true,--部落协作披风
-	[63207] = true,--部落协和披风
-	[65274] = true,--部落协同披风
-	[152094]= true,--泰沙拉克
-	[103678]= true,--传送永恒岛
+	[63352] = true,-- Cloak of Coordination
+	[63206] = true,-- Cape of Coordination
+	[65360] = true,-- Cloak of Cooperation
+	[63353] = true,-- Horde Cloak of Coordination
+	[63207] = true,-- Horde Cape of Coordination
+	[65274] = true,-- Horde Cloak of Cooperation
+	[152094]= true,-- Taeshalach
+	[103678]= true,-- Teleport to Timeless Isle
 }
 
 StaticPopupDialogs.MerchantFrame_Sell = {
-    text = "即将自动售卖\n售卖低于多少装等的装备?",  -- 提示文本
-    button1 = "确认",          -- 确认按钮
-    button2 = "取消",          -- 取消按钮
-    timeout = 0,               -- 不自动关闭
-    whileDead = true,          -- 死亡时可用
-    hideOnEscape = true,       -- 按ESC关闭
-    hasEditBox = true,         -- 包含输入框
+    text = "About to auto-sell\nSell equipment below which item level?",  -- Prompt text
+    button1 = "Confirm",       -- Confirm button
+    button2 = "Cancel",        -- Cancel button
+    timeout = 0,               -- Do not auto-close
+    whileDead = true,          -- Usable while dead
+    hideOnEscape = true,       -- Close on ESC
+    hasEditBox = true,         -- Include an input box
 	OnShow = function(self)
 		self.EditBox:SetScript("OnEscapePressed", function(EditBox)
-            self:Hide()  -- 直接关闭窗口
+            self:Hide()  -- Close the window immediately
         end)
     end,
-    OnAccept = function(self)  -- 点击确认后的回调
+    OnAccept = function(self)  -- Callback after clicking Confirm
         local BoxLevel = tonumber(self.EditBox:GetText())
 		local N,c,n
 		for b=0,4 do
@@ -67,7 +67,7 @@ StaticPopupDialogs.MerchantFrame_Sell = {
     end,
 }
 local Sell = CreateFrame("Button", "AddUISell", MerchantFrame.NineSlice, "UIPanelButtonTemplate")
-Sell:SetText("售卖")
+Sell:SetText("Sell")
 Sell:SetWidth(55)
 Sell:SetHeight(22)
 Sell:SetPoint("TOPLEFT", 57, 0)
@@ -75,8 +75,8 @@ Sell:SetScript("OnClick", function()
 	StaticPopup_Show("MerchantFrame_Sell")
 end)
 
--- 快速拾取（最快：LOOT_READY 最早时机立即全收）
--- 思路参考 Plumber（作者 Peterodox）Modules/LootUI/FastLoot.lua
+-- Fast looting (fastest: grab everything the instant LOOT_READY fires)
+-- Approach inspired by Plumber (author Peterodox) Modules/LootUI/FastLoot.lua
 if AddUIDB.sq == true then
 	local slotProcessed, retryPending
 	local function LootAll()

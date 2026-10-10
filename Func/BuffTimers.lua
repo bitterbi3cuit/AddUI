@@ -1,8 +1,8 @@
 local _,ns = ...
 
-SetCVar("buffDurations", 1)	--显示buff持续时间,有些插件会给关了
+SetCVar("buffDurations", 1)	-- show buff durations; some addons turn this off
 
-ns.tips("小于10分钟的BUFF和DEBUFF显示秒")
+ns.tips("Show seconds for buffs and debuffs under 10 minutes")
 local function Bufftime(seconds)
 if type(seconds) ~="number" then return end 
 if seconds > 86400 then 
@@ -42,7 +42,7 @@ for i = 1, #frames do
 	end
 end
 
-ns.tips("装备面板显示当前等级和最高等级")
+ns.tips("Show current and highest item level on the equipment pane")
 ns.hook('PaperDollFrame_SetItemLevel', function(self, unit) 
    if (unit ~= 'player') then return end 
 
@@ -69,13 +69,12 @@ ns.hook('PaperDollFrame_SetItemLevel', function(self, unit)
    self.tooltip =  "|cffffffff".. STAT_AVERAGE_ITEM_LEVEL .. ' ' .. ilvl2 
 end)
 
+ns.tips("Show movement speed on the character pane")
 
-ns.tips("角色面板显示移动速度")
-
--- 12.0.5 起移动速度变为秘密值，不能做数学运算。
--- 采用独立显示（不插入暴雪统计行，避免污染其刷新循环）：
---   在角色面板背景右下创建独立文本，用 AbbreviateNumbers 兼容秘密值显示百分比。
--- 数值格式简化来自https://bbs.nga.cn/read.php?tid=46650149
+-- As of 12.0.5 movement speed became a secret value and cannot be used in arithmetic.
+-- Use a standalone display (do not insert into Blizzard's stat rows, to avoid polluting their refresh loop):
+--   Create separate text at the bottom-right of the character pane background, using AbbreviateNumbers to display the percentage with secret-value compatibility.
+-- Number formatting simplified from https://bbs.nga.cn/read.php?tid=46650149
 local SPEED_FORMAT_OPTIONS = {
     breakpointData = {
         {
@@ -88,13 +87,13 @@ local SPEED_FORMAT_OPTIONS = {
     },
 }
 
--- 独立移动速度文本，锚定到角色面板背景右下（左下角对齐背景右下角）
--- 注意：CharacterFrame.Background 是纹理（BACKGROUND 层），在其上创建文字会被盖住，
--- 因此创建在顶层 CharacterFrame 上并提高绘制层级。
--- 必须在 PLAYER_LOGIN（所有暴雪 UI 加载完成）后才 hook，否则 hooksecurefunc 找不到函数。
--- 独立显示方案（激活）：不污染暴雪刷新循环，任何情况都不报错
--- 说明：往 PAPERDOLL_STATCATEGORIES 插入统计行会在 12.0.5 秘密值时代污染
---       PaperDollFrame_UpdateStats 刷新循环导致报错，故用独立 Frame 显示。
+-- Standalone movement-speed text, anchored to the bottom-right of the character pane background (bottom-left corner aligned to the background's bottom-right corner)
+-- Note: CharacterFrame.Background is a texture (BACKGROUND layer); text created on it would be covered,
+-- so it is created on the top-level CharacterFrame with a raised draw layer.
+-- Must be hooked only after PLAYER_LOGIN (once all Blizzard UI has loaded), otherwise hooksecurefunc cannot find the function.
+-- Standalone display approach (active): does not pollute Blizzard's refresh loop, and cannot error under any circumstance
+-- Note: inserting a stat row into PAPERDOLL_STATCATEGORIES would, in the 12.0.5 secret-value era, pollute
+--       the PaperDollFrame_UpdateStats refresh loop and cause errors, hence a standalone Frame is used.
 ns.event("PLAYER_LOGIN", function()
     if not (AddUIDB and AddUIDB.movspeed) then return end
     if not PaperDollFrame or not CharacterFrame or not CharacterFrame.Background then return end
@@ -107,14 +106,14 @@ ns.event("PLAYER_LOGIN", function()
     speedtext:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 0, 0)
     speedtext:SetTextColor(1, 1, 1, 1)
 
-    local runSpeed, flightSpeed, swimSpeed  -- 缓存，供 tooltip 使用（秘密值）
+    local runSpeed, flightSpeed, swimSpeed  -- cache, for tooltip use (secret values)
 
-    -- 鼠标悬停提示：显示奔跑/飞行/游泳速度（暴雪原版 MovementSpeed_OnEnter 的功能）
-    -- 速度是秘密值，不能用 %d 运算，需用 AbbreviateNumbers 兼容处理
-    -- 注意：FormatSpeed / BuildTooltipLines 必须定义在 UpdateSpeedText 之前，
-    --       否则 UpdateSpeedText 内引用它们是全局 nil（Lua 词法作用域）
+    -- Mouse-over tooltip: show run/flight/swim speed (the function of Blizzard's original MovementSpeed_OnEnter)
+    -- Speed is a secret value; %d arithmetic cannot be used on it, so AbbreviateNumbers is needed for compatibility
+    -- Note: FormatSpeed / BuildTooltipLines must be defined before UpdateSpeedText,
+    --       otherwise references to them inside UpdateSpeedText would be global nil (Lua lexical scoping)
     local function FormatSpeed(formatString, secretSpeed)
-        -- 本地化格式串如 "奔跑速度：%d%%"，把 %d%% 替换为 %s 再传入含 % 的字符串
+        -- The localized format string is like "Run Speed: %d%%"; replace %d%% with %s, then pass in a string containing %
         return format(formatString:gsub("%%d%%%%", "%%s"), AbbreviateNumbers(secretSpeed, SPEED_FORMAT_OPTIONS))
     end
 
@@ -136,7 +135,7 @@ ns.event("PLAYER_LOGIN", function()
             speed = flight
         end
         speedtext:SetText(format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_MOVEMENT_SPEED).." "..AbbreviateNumbers(speed, SPEED_FORMAT_OPTIONS))
-        -- tooltip 显示中时同步刷新内容，实现实时更新
+        -- While the tooltip is displayed, refresh its contents in sync, for live updates
         if GameTooltip:IsOwned(frame) then
             BuildTooltipLines()
         end
@@ -154,10 +153,10 @@ ns.event("PLAYER_LOGIN", function()
     speedtext:SetScript("OnEnter", OnEnter)
     speedtext:SetScript("OnLeave", OnLeave)
 
-    -- 暴雪原版是给统计行挂 OnUpdate 每帧调用 MovementSpeed_OnUpdate 来实时刷新，
-    -- 而不是靠 SPEED_UPDATE 事件（该事件只在"速度属性值"变化时触发，上下坐骑不触发）。
-    -- frame 是 CharacterFrame 的子框架：面板打开时 OnUpdate 每帧更新，
-    -- 面板关闭时 frame 随之隐藏、OnUpdate 自动停止，无性能浪费。
+    -- Blizzard's original attaches OnUpdate to the stat row to call MovementSpeed_OnUpdate every frame for live refresh,
+    -- rather than relying on the SPEED_UPDATE event (which only fires when the "speed stat value" changes, not on mounting/dismounting).
+    -- frame is a child of CharacterFrame: while the pane is open, OnUpdate updates every frame;
+    -- when the pane closes, frame is hidden along with it and OnUpdate stops automatically, so no performance is wasted.
     frame:SetScript("OnUpdate", UpdateSpeedText)
     CharacterFrame:HookScript("OnShow", UpdateSpeedText)
 end)

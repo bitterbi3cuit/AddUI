@@ -4,6 +4,9 @@ local SetPrice = 0
 local SetNumber = 1
 local SetAutoKO = false
 local SetIsSure = false
+local purchaseItemID          -- replaces the implicit self.ItemID state
+local updatingPrice, updatingAmount
+
 local KOAHFrame = CreateFrame("Frame")
 KOAHFrame:RegisterEvent("COMMODITY_PRICE_UPDATED")
 KOAHFrame:RegisterEvent("COMMODITY_SEARCH_RESULTS_UPDATED")
@@ -24,10 +27,10 @@ KOAHFrame:SetScript("OnEvent", function(self, event,...)
 			
 			
 			local AHFRAME = AuctionHouseFrame.CommoditiesBuyFrame.BuyDisplay
-			local KOAHS = CreateFrame("Frame",AHFRAME)
+			local KOAHS = CreateFrame("Frame", nil, AHFRAME)
 			KOAHS:SetParent(AHFRAME)
 			
-			--按空格拍卖
+			-- Spacebar-to-auction feature
 			if AuctionHouseFrame.CommoditiesSellFrame.PostButton then
 				local SetAutoPost = false
 				if KOAHS.AutoPost then
@@ -39,7 +42,7 @@ KOAHFrame:SetScript("OnEvent", function(self, event,...)
 				KOAHS.AutoPost:SetPoint("TOPLEFT", AuctionHouseFrame.CommoditiesSellFrame.PostButton, "BOTTOMLEFT", 0, -10)
 				KOAHS.AutoPost:SetFrameStrata("HIGH")
 				KOAHS.AutoPost:SetChecked(SetAutoPost)
-				KOAHS.AutoPost.text:SetText("按空格创建拍卖")
+				KOAHS.AutoPost.text:SetText("Press Spacebar to create auction")
 				KOAHS.AutoPost:SetScript("OnClick", function (self)
 					SetAutoPost = self:GetChecked()
 				end)
@@ -56,7 +59,7 @@ KOAHFrame:SetScript("OnEvent", function(self, event,...)
 				KOAHS.AutoPost2:SetPoint("TOPLEFT", AuctionHouseFrame.ItemSellFrame.PostButton, "BOTTOMLEFT", 0, -10)
 				KOAHS.AutoPost2:SetFrameStrata("HIGH")
 				KOAHS.AutoPost2:SetChecked(SetAutoPost)
-				KOAHS.AutoPost2.text:SetText("按空格创建拍卖")
+				KOAHS.AutoPost2.text:SetText("Press Spacebar to create auction")
 				KOAHS.AutoPost2:SetScript("OnClick", function (self)
 					SetAutoPost = self:GetChecked()
 				end)
@@ -69,9 +72,9 @@ KOAHFrame:SetScript("OnEvent", function(self, event,...)
 					end
 				end)
 			end
-			---空格拍卖只到这里
+			--- End of the spacebar-to-auction block
 
-			--价格输入框
+			-- Price input box
 			local GoldIcon = "\124TInterface\\MoneyFrame\\UI-GoldIcon:%d:%d:1:0\124t";
 			KOAHS.gold = CreateFrame("EditBox", nil, KOAHS, "InputBoxTemplate")
 			KOAHS.gold:SetSize(60, 30)
@@ -89,9 +92,9 @@ KOAHFrame:SetScript("OnEvent", function(self, event,...)
 			
 			KOAHS.goldText = KOAHS:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
 			KOAHS.goldText:SetPoint("RIGHT",KOAHS.gold,"LEFT",-5,-1)
-			KOAHS.goldText:SetFont("Fonts\\ARKai_T.ttf", 16, "OUTLINE")
+			KOAHS.goldText:SetFont(STANDARD_TEXT_FONT, 16, "OUTLINE")
 			KOAHS.goldText:SetTextColor(1,1,1)
-			KOAHS.goldText:SetText("目标价格")
+			KOAHS.goldText:SetText("Target price")
 			
 			KOAHS.goldicon = KOAHS.gold:CreateTexture(nil, "OVERLAY")
 			KOAHS.goldicon:SetSize(12, 12)	
@@ -109,6 +112,8 @@ KOAHFrame:SetScript("OnEvent", function(self, event,...)
 				self:ClearFocus()
 			end)
 			KOAHS.gold:SetScript("OnTextChanged", function(self)
+				if updatingPrice then return end
+				updatingPrice = true
 				if self:GetText() and tonumber(self:GetText()) then
 					SetPrice = tonumber(self:GetText())
 					KOAHS.gold:SetText(SetPrice)
@@ -116,10 +121,11 @@ KOAHFrame:SetScript("OnEvent", function(self, event,...)
 					KOAHS.gold:SetText(0)
 					SetPrice = 0
 				end
+				updatingPrice = false
 			end)
 			
 			
-			--数量输入框
+			-- Quantity input box
 			KOAHS.amount = CreateFrame("EditBox", nil, KOAHS, "InputBoxTemplate")
 			KOAHS.amount:SetSize(60, 30)
 			KOAHS.amount:SetPoint("BOTTOM",AHFRAME,"BOTTOM",40,-3)
@@ -136,13 +142,13 @@ KOAHFrame:SetScript("OnEvent", function(self, event,...)
 			
 			KOAHS.amountText = KOAHS:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
 			KOAHS.amountText:SetPoint("RIGHT",KOAHS.amount,"LEFT",-5,-1)
-			KOAHS.amountText:SetFont("Fonts\\ARKai_T.ttf", 16, "OUTLINE")
+			KOAHS.amountText:SetFont(STANDARD_TEXT_FONT, 16, "OUTLINE")
 			KOAHS.amountText:SetTextColor(1,1,1)
-			KOAHS.amountText:SetText("数量")
+			KOAHS.amountText:SetText("Quantity")
 			
 			KOAHS.amount:SetScript("OnEnterPressed", function(self)
 				if self:GetText() and tonumber(self:GetText()) then
-					SetNumber = tonumber(self:GetText())
+					SetNumber = math.max(1, math.floor(tonumber(self:GetText())))
 					KOAHS.amount:SetText(SetNumber)
 				else
 					KOAHS.amount:SetText(1)
@@ -151,25 +157,28 @@ KOAHFrame:SetScript("OnEvent", function(self, event,...)
 				self:ClearFocus()
 			end)
 			KOAHS.amount:SetScript("OnTextChanged", function(self)
+				if updatingAmount then return end
+				updatingAmount = true
 				if self:GetText() and tonumber(self:GetText()) then
-					SetNumber = tonumber(self:GetText())
+					SetNumber = math.max(1, math.floor(tonumber(self:GetText())))
 					KOAHS.amount:SetText(SetNumber)
 				else
 					KOAHS.amount:SetText(1)
 					SetNumber = 1
 				end
+				updatingAmount = false
 			end)
 			
-			--秒杀按钮
+			-- Instant-buy button
 			KOAHS.button = CreateFrame("Button", "KOAH", KOAHS, "UIPanelButtonTemplate")
 			KOAHS.button:SetSize(88, 22)
-			KOAHS.button:SetText("秒杀")
+			KOAHS.button:SetText("Instant Buy")
 			KOAHS.button:SetPoint("BOTTOMRIGHT", AHFRAME, "BOTTOMRIGHT",-2,1.5)
 			KOAHS.button:SetScript("OnClick", function()
 				KOAH:SetEnabled(false)
 				SetIsSure = true
-				self.ItemID = AuctionHouseFrame.CommoditiesBuyFrame.BuyDisplay.ItemDisplay:GetItemID()
-				C_AuctionHouse.StartCommoditiesPurchase(self.ItemID,SetNumber)
+				purchaseItemID = AuctionHouseFrame.CommoditiesBuyFrame.BuyDisplay.ItemDisplay:GetItemID()
+				C_AuctionHouse.StartCommoditiesPurchase(purchaseItemID,SetNumber)
 			end)
 
 			KOAHS:EnableKeyboard(true)
@@ -183,14 +192,14 @@ KOAHFrame:SetScript("OnEvent", function(self, event,...)
 				end
 			end)
 
-			--勾选框
+			-- Checkbox
 			KOAHS.check = CreateFrame("CheckButton", nil, KOAHS, "InterfaceOptionsCheckButtonTemplate")
 			KOAHS.check:SetPoint("RIGHT", KOAHS.button, "LEFT", 3, -1)
 			KOAHS.check:SetChecked(false)
 			KOAHS.check:SetScale(1.1)
 			KOAHS.check:SetScript("OnEnter",function(self) 
 				GameTooltip:SetOwner(self, "ANCHOR_RIGHT") 
-				GameTooltip:AddLine("出现任何问题概不负责,|cffFFFFFF\n勾选此项后,按空格即可秒杀|r") 
+				GameTooltip:AddLine("Use at your own risk.|cffFFFFFF\nWhen checked, press Spacebar to buy instantly.|r") 
 				GameTooltip:Show() 
 			end)
 			KOAHS.check:SetScript("OnLeave", function(self)    
@@ -220,20 +229,20 @@ KOAHFrame:SetScript("OnEvent", function(self, event,...)
 	if event == "BID_ADDED" or event == "BIDS_UPDATED" then
         KOAH:SetEnabled(true)
     end
-	if not self.ItemID then return end
+	if not purchaseItemID then return end
 	if not SetIsSure then return end
 	if event == "COMMODITY_PRICE_UPDATED" then
 		local itemPrice, itemAllPrice = ...
-		if not itemAllPrice then print("未查询到价格") return end
-		local itemName = C_Item.GetItemNameByID(self.ItemID)
+		if not itemAllPrice then print("No price data found.") return end
+		local itemName = C_Item.GetItemNameByID(purchaseItemID)
 		local printPrice = C_CurrencyInfo.GetCoinTextureString(tonumber(itemAllPrice/SetNumber))
 		if itemPrice and itemAllPrice <= SetPrice*10000*SetNumber then--and itemPrice <= SetPrice*10000
-			C_AuctionHouse.ConfirmCommoditiesPurchase(self.ItemID,SetNumber)
-			print("|cff00FFFF购买|r "..itemName.."x"..SetNumber.."|cff00FFFF 等待系统确认,单价|r" ..printPrice)
+			C_AuctionHouse.ConfirmCommoditiesPurchase(purchaseItemID,SetNumber)
+			print("|cff00FFFFBuy|r "..itemName.."x"..SetNumber.."|cff00FFFF awaiting system confirmation, unit price |r" ..printPrice)
 		else
 			--C_AuctionHouse.CancelCommoditiesPurchase()
 			KOAH:SetEnabled(true)
-			print("|cffDC143C购买|r "..itemName.."x"..SetNumber.."|cffDC143C 失败,当前单价:|r".. printPrice)
+			print("|cffDC143CBuy failed|r "..itemName.."x"..SetNumber.."|cffDC143C, current unit price: |r".. printPrice)
 		end
 		SetIsSure = false
 	end

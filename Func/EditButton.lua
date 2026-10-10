@@ -6,13 +6,13 @@ local layoutString = [[
 ]]
 
 	local impbutton = CreateFrame("Button", nil, EditModeManagerFrame, "UIPanelButtonTemplate")
-	impbutton:SetText("使用简繁的编辑模式")
+	impbutton:SetText("Use Jianfan Edit Mode")
 	impbutton:SetWidth(177)
 	impbutton:SetPoint("LEFT",EditModeManagerFrame.LayoutDropdown,"RIGHT", 20, 0)
 	impbutton:SetScript("OnClick", function()
 		local mylayout = C_EditMode.ConvertStringToLayoutInfo(layoutString)
 		if mylayout then
-			mylayout.layoutName = "简繁的编辑模式"
+			mylayout.layoutName = "Jianfan Edit Mode"
 			mylayout.layoutType = 1
 			
 			-- 1. 获取一次数据并存入变量，确保操作的是同一个 Table
@@ -27,7 +27,7 @@ local layoutString = [[
 				end
 			end
 			if account >= Constants.EditModeConsts.EditModeMaxLayoutsPerType then
-				ns.AATEXT("|cffFF0000通用布局数量已达上限,需要先删除一个|r")
+				ns.AATEXT("|cffFF0000The maximum number of general layouts has been reached. Delete one layout first.|r")
 			else
 				-- 3. 插入数据
 				table.insert(layoutsList, mylayout)
@@ -40,10 +40,10 @@ local layoutString = [[
 				-- 所以要在自定义数组位置 #layoutsList 上加上预设布局数量偏移（Enum.EditModePresetLayoutsMeta.NumValues = 2）。
 				C_EditMode.SetActiveLayout(Enum.EditModePresetLayoutsMeta.NumValues + #layoutsList)
 				
-				ns.AATEXT("|cff00FFFF简繁|r|cff00FF00的布局已成功保存并启用|r")
+				ns.AATEXT("|cff00FFFFJianfan|r|cff00FF00layout saved and activated successfully|r")
 			end
 		else
-			ns.AATEXT("|cffFF0000错误: 字符串格式非法, 无法转换|r")
+			ns.AATEXT("|cffFF0000Error: Invalid string format, cannot convert|r")
 		end
 	end)
 
@@ -57,13 +57,13 @@ ns.hook("CreateFrame", function(type, name, parent, template)
 
 	if name == "DetailsExportWindowEditor" and not jianfanDetails then
 		local jianfanDetails = CreateFrame("Button", "jianfanDetails", DetailsExportWindow, "UIPanelButtonTemplate")
-		jianfanDetails:SetText("使用简繁的配置")
+		jianfanDetails:SetText("Use Jianfan configuration")
 		jianfanDetails:SetSize(140,24)
 		jianfanDetails:SetPoint("BOTTOMLEFT", 17, 15)
 		jianfanDetails:SetScript("OnClick", function()
 			if DetailsExportWindowEditor then
 				DetailsExportWindowEditor:SetText(de)
-				print("已粘贴简繁的Details配置")
+				print("Pasted Jianfan’s Details configuration")
 			end
 		end)
 	end

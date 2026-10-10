@@ -1,5 +1,5 @@
 local _,ns = ...
-ns.tips("大秘境分数页面显示公会记录")
+ns.tips("Show guild record on the Mythic+ score page")
 -- http://bbs.nga.cn/read.php?tid=14577304&fav=bf7e7510
 ----------------------
 local frame

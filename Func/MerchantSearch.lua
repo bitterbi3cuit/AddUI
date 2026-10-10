@@ -1,10 +1,10 @@
 local _,ns = ...
-ns.tips("商人出售物品搜索")
+ns.tips("Merchant item search")
 
 local activeSearch = ""
 local perPage = MERCHANT_ITEMS_PER_PAGE
-local infoCache = {}  -- C_MerchantFrame.GetItemInfo 缓存
-local tipCache = {}   -- 鼠标提示文本缓存
+local infoCache = {}  -- cache for C_MerchantFrame.GetItemInfo
+local tipCache = {}   -- cache for tooltip text
 
 local function ClearSlot(i)
 	local btn = _G["MerchantItem"..i.."ItemButton"]
@@ -123,7 +123,7 @@ ns.hook("MerchantFrame_Update", function()
 		btn:Show()
 	end
 
-	-- 根据搜索结果页数控制分页
+	-- Control pagination based on the number of search result pages
 	local totalMatchPages = math.ceil(#matches / perPage)
 	if totalMatchPages <= 1 then
 		MerchantPageText:Hide()

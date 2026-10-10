@@ -2,7 +2,7 @@
 ns.event("PLAYER_ENTERING_WORLD", function()
     if not AddUIDB.lfgkg then return end
     if C_AddOns.IsAddOnLoaded("MeetingStone") then return end
-    --配置PGF
+    --Configure PGF (Premade Groups Filter)
     if C_AddOns.IsAddOnLoaded("PremadeGroupsFilter") then
 	if UsePGFButtonText then 
 		UsePGFButton:ClearAllPoints()
@@ -10,12 +10,12 @@ ns.event("PLAYER_ENTERING_WORLD", function()
 		UsePGFButton:SetPoint("TOP", LFGListFrame.SearchPanel.RefreshButton, "TOP", 0, -3)
 	end
 	if PremadeGroupsFilterSettings then
-		PremadeGroupsFilterSettings.ratingInfo = false	--队长评分
-		PremadeGroupsFilterSettings.classBar = false	--职业颜色栏
-		PremadeGroupsFilterSettings.leaderCrown = false	--显示队长标记
-		PremadeGroupsFilterSettings.oneClickSignUp = false	--点击申请
+		PremadeGroupsFilterSettings.ratingInfo = false	--Leader rating
+		PremadeGroupsFilterSettings.classBar = false	--Class color bar
+		PremadeGroupsFilterSettings.leaderCrown = false	--Show leader crown
+		PremadeGroupsFilterSettings.oneClickSignUp = false	--Click to apply
 	end
-	--12.1暴雪把刷新按钮和搜索框大小改了,恢复到之前的布局
+	--Patch 12.1: Blizzard changed the refresh button and search box sizes; restore the previous layout
 	if LFGListFrame.SearchPanel.RefreshButton then
 		LFGListFrame.SearchPanel.RefreshButton:ClearAllPoints()
 		LFGListFrame.SearchPanel.RefreshButton:SetPoint("LEFT", LFGListFrame.SearchPanel.CategoryName, "RIGHT", 15, 1)
@@ -25,7 +25,8 @@ ns.event("PLAYER_ENTERING_WORLD", function()
 	end
 end
 
---[[解决预创建GetPlaystyleString报错问题https://github.com/0xbs/premade-groups-filter/issues/64
+--[[Fix the GetPlaystyleString error in Premade Groups Filter
+https://github.com/0xbs/premade-groups-filter/issues/64
 function LFMPlus_GetPlaystyleString(playstyle,activityInfo)
   if activityInfo and playstyle ~= (0 or nil) and C_LFGList.GetLfgCategoryInfo(activityInfo.categoryID).showPlaystyleDropdown then
     local typeStr
@@ -47,7 +48,7 @@ end
 C_LFGList.GetPlaystyleString = function(playstyle,activityInfo)
   return LFMPlus_GetPlaystyleString(playstyle, activityInfo)
 end]]
---双击申请
+--Double-click to apply
 local function HookApplicationClick()
 	if LFGListFrame.SearchPanel.SignUpButton:IsEnabled() then
 		LFGListFrame.SearchPanel.SignUpButton:Click()
@@ -61,7 +62,7 @@ ns.hook("LFGListSearchEntry_OnLoad", function(self)
 	LFGListFrame.SearchPanel.FilterButton.ResetButton:SetPoint("TOPLEFT",LFGListFrame.SearchPanel.FilterButton,"BOTTOMRIGHT",-20,2)
 end)
 
---搜索页分数
+--Score shown on the search page
 ns.hook("LFGListSearchEntry_Update", function(self)
 	if not PVEFrame:IsShown() then return end
     local resultID = self.resultID
@@ -76,7 +77,7 @@ ns.hook("LFGListSearchEntry_Update", function(self)
     self.leaderMPlusRating = resultInfo.leaderOverallDungeonScore
 	if not self.leaderMPlusRating then return end
 	local scoreColor = C_ChallengeMode.GetDungeonScoreRarityColor(self.leaderMPlusRating) or HIGHLIGHT_FONT_COLOR
-	if not self.score then--分数
+	if not self.score then--Score
 		self.score = self:CreateFontString(nil, "ARTWORK")
 		self.score:SetFont(STANDARD_TEXT_FONT, 15, 'OUTLINE')
 	end
@@ -94,10 +95,10 @@ ns.hook("LFGListSearchEntry_Update", function(self)
 		if resultInfo.isDelisted then
 			self.Playstyle:SetTextColor(0.3,0.3,0.3)
 		else
-			self.Playstyle:SetTextColor(0,1,0)
+		self.Playstyle:SetTextColor(0,1,0)
 		end
 	end
-	if not self.infotext then--说明
+	if not self.infotext then--Comment
 		self.infotext = self:CreateFontString(nil, "ARTWORK")
 		self.infotext:SetFont(STANDARD_TEXT_FONT, 13, 'OUTLINE')
 		self.infotext:SetPoint("BOTTOMLEFT", self.Playstyle, "BOTTOMRIGHT", 0, 3)
@@ -125,15 +126,19 @@ ns.hook("LFGListSearchEntry_Update", function(self)
     end
 end)
 
---保留搜索内容LFGList.lua
+-- Preserve search contents (LFGList.lua)
 function LFGListSearchPanel_Clear(self)
-	--C_LFGList.ClearSearchResults();
-	--C_LFGList.ClearSearchTextFields();
-	self.selectedResult = nil;
-	LFGListSearchPanel_UpdateResultList(self);
+    -- C_LFGList.ClearSearchResults();    -- intentionally skipped: preserve results
+    -- C_LFGList.ClearSearchTextFields(); -- intentionally skipped: preserve search text
+    self.selectedResult = nil;
+    -- Guard: GetSearchResults() returns nil before the first search, which causes
+    -- LFGListSearchPanel_UpdateResults to pass nil to pairs() → LUA_WARNING spam.
+    if C_LFGList.GetSearchResults() ~= nil then
+        LFGListSearchPanel_UpdateResultList(self);
+    end
 end
 
---保留申请留言LFGList.lua
+--Preserve the application note (LFGList.lua)
 function LFGListApplicationDialog_Show(self, resultID)
 	local searchResultInfo = C_LFGList.GetSearchResultInfo(resultID);
 	--if ( searchResultInfo.activityID ~= self.activityID ) then
@@ -145,12 +150,12 @@ function LFGListApplicationDialog_Show(self, resultID)
 	LFGListApplicationDialog_UpdateRoles(self);
 	StaticPopupSpecial_Show(self);
 end
---申请列表
+--Applicant list
 ns.hook("LFGListApplicationViewer_UpdateApplicantMember", function(self, appID, memberIdx, status, pendingStatus)
 	self:SetHeight(13)
 	local info = C_LFGList.GetApplicantInfo(appID)
 	
-	if not self.infotext then--说明
+	if not self.infotext then--Comment
 		self.infotext = self:CreateFontString(nil, "ARTWORK")
 		self.infotext:SetFont(STANDARD_TEXT_FONT, 11, 'OUTLINE')
 		self.infotext:SetTextColor(0.9,0.9,0.9)
@@ -164,11 +169,11 @@ ns.hook("LFGListApplicationViewer_UpdateApplicantMember", function(self, appID, 
 	end
 end)
 
---不是队长也显示查找队伍按钮
+--Show the "Browse Groups" button even when not the leader
 ns.hook("LFGListApplicationViewer_UpdateInfo", function(self)
 	LFGListFrame.ApplicationViewer.BrowseGroupsButton:Show()
 end)
---浏览队伍按钮改成回到初始菜单
+--Change the Browse Groups button into a return-to-main-menu button
 LFGListFrame.ApplicationViewer.BrowseGroupsButton:SetScript("OnClick", function()
 	LFGListFrame_SetActivePanel(LFGListFrame,LFGListFrame.CategorySelection)
 end)
@@ -180,11 +185,10 @@ f:SetScript("OnEvent", function(self, event, resultid, status, prevstatus, title
 	local info = C_LFGList.GetSearchResultInfo(resultid)
 	if not info or not info.activityIDs or #info.activityIDs == 0 then return end
 	local activityID = info.activityIDs[1]
-	local name = C_LFGList.GetActivityFullName(activityID) or "未知活动"
-	local msg = "已加入: " .. name .. " " .. (title or "")
+	local name = C_LFGList.GetActivityFullName(activityID) or "Unknown activity"
+	local msg = "Joined: " .. name .. " " .. (title or "")
 	print("|cffb044a2ADDUI|r " .. msg.." "..info.leaderName)
 	ns.AATEXT(msg)
 end)
-
 
 end)

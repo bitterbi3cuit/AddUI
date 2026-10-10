@@ -1,30 +1,35 @@
 ﻿local _,ns = ...
 
-SetCVar("overrideArchive", 0) --和谐国服  1:开启      0:关闭
---[重载命令] 
-ns.tips("重载快捷命令/rl或/aa")
-SlashCmdList["RELOADUI"] = function() ReloadUI() end 
+SetCVar("overrideArchive", 0) -- Anti-censorship (CN realms)  1: on      0: off
+--[Reload commands]
+ns.tips("Reload shortcut: /rl or /aa")
+SlashCmdList["RELOADUI"] = function() ReloadUI() end
 SLASH_RELOADUI1 = "/rl"
 SLASH_RELOADUI2 = "/aa"
 
 
-ns.tips("倒计时置顶防止被钥匙框体遮挡")
+ns.tips("Pin the countdown so the key frame cannot cover it")
 ns.event('START_TIMER', function()
 	if InCombatLockdown() then return end
 	if not TimerTrackerTimer1 then return end
 	TimerTrackerTimer1:SetFrameStrata("TOOLTIP")
 end)
-ns.tips("就位确认置顶防止被钥匙框体遮挡")
+ns.tips("Pin the ready check so the key frame cannot cover it")
 ns.event('READY_CHECK', function()
 	if InCombatLockdown() then return end
+	if not ReadyCheckFrame then return end
 	ReadyCheckFrame:SetFrameStrata("TOOLTIP")
 end)
 
-ns.tips("区域文字鼠标穿透(大秘境开门快速选怪会碍事)")
---会自己消失的提示(区域文字等)一律穿透;不会自动消失、要玩家手动点的提示(积分板/点击展开的场景横幅)
---整棵保留鼠标,否则它和它下面那个大 CLOSE 都点不动
---⚠️ 别改成用 IsObjectType/GetObjectType/GetName 判断类型(返回值可能是秘密值,插件里 if 会报错),
---  frame.Click 这类鸭子类型也不行(widget 方法表共用,非按钮也索引得到,会导致全部跳过、穿透失效)
+ns.tips("Mouse passthrough on zone toasts (they get in the way when picking targets after a key opens)")
+-- Toast content frames are created dynamically (pooled), so mouse must be disabled recursively
+-- on the main frame and on every generated toast.
+-- Two categories must keep the mouse, otherwise sticky popups cannot be closed:
+-- 1. Buttons: the big CLOSE at the bottom (a fixed child of the main frame with no
+--    hideAutomatically, so it is only identifiable by its button type), the scoreboard CLOSE,
+--    and the scene toast that expands on click.
+-- 2. Any toast with hideAutomatically = false (whole subtree): a pooled instance that was
+--    disabled does not restore itself when shown again, so keep its interactive children alive too.
 local function SetToastMousePassthrough(frame)
 	if not frame then return end
 	if frame == EventToastManagerFrame.HideButton then return end
@@ -42,22 +47,22 @@ if EventToastManagerFrame then
 end
 
 
-ns.tips("聊天反和谐")
-local function fuckyou()
+ns.tips("Chat profanity filter override")
+local function ApplyFilterOverride()
 --ConsoleExec("portal TW")
 ConsoleExec("profanityFilter 0")
 end
-ns.event("ADDON_LOADED", fuckyou)
+ns.event("ADDON_LOADED", ApplyFilterOverride)
 
---9.1反和谐好友不能组队https://bbs.nga.cn/read.php?&tid=27432996
+-- 9.1 cross-realm friends cannot group: https://bbs.nga.cn/read.php?&tid=27432996
 local pre = C_BattleNet.GetFriendGameAccountInfo
 C_BattleNet.GetFriendGameAccountInfo = function(...)
 	local gameAccountInfo = pre(...)
-	gameAccountInfo.isInCurrentRegion = true
+	if gameAccountInfo then gameAccountInfo.isInCurrentRegion = true end
 	return gameAccountInfo;
 end
 
-ns.tips("重置喊话")
+ns.tips("Relay reset announcements")
 ns.event('CHAT_MSG_SYSTEM', function(event, msg)
 	if ns.MM(msg) then return end
 	if (msg:lower():match("无法重置") or msg:lower():match("已被重置")) and IsInGroup() and UnitIsGroupLeader("player") then
@@ -65,14 +70,14 @@ ns.event('CHAT_MSG_SYSTEM', function(event, msg)
 	end
 end)
 
---就位声音
+-- Ready check sound
 ns.event('READY_CHECK', function()
 	PlaySoundFile(567478, "Master")
-	--PlaySoundFile("Interface\\AddOns\\AddUI\\Func\\call\\准备好了吗.mp3", "Master")
+	--PlaySoundFile("Interface\\AddOns\\AddUI\\Func\\call\\AreYouReady.mp3", "Master")
 end)
 
-ns.tips("/cd或者/cd 10倒数,/cdd停止倒数")
---倒数/cd默认10秒
+ns.tips("/cd or /cd 10 to start a countdown, /cdd to stop")
+-- Countdown /cd defaults to 10 seconds
 SlashCmdList["COUNTDOWN"] = function(msg)
 	local num1 = gsub(msg, "(%s*)(%d+)", "%2");
 	local number = tonumber(num1);
@@ -81,53 +86,62 @@ SlashCmdList["COUNTDOWN"] = function(msg)
 		C_PartyInfo.DoCountdown(number);
 	end
 end
---停止倒数
+-- Stop countdown
 SlashCmdList["COUNTDOWNSTOP"] = function()
 	C_PartyInfo.DoCountdown(0);
 end
 SLASH_COUNTDOWNSTOP1 = "/cdd"
 
-ns.tips("地下城页面添加按钮查看低保按钮")
-local clear = CreateFrame("Button", "AddUISaveButton", PVEFrame.NineSlice, "UIPanelButtonTemplate")
-clear:SetText("宏伟宝库奖励")
-clear:SetWidth(110)
-clear:SetHeight(22)
-clear:SetPoint("TOPLEFT", 57, 0)
-clear:SetScript("OnClick", function()
-	if (WeeklyRewardsFrame and WeeklyRewardsFrame:IsShown()) then
-	HideUIPanel(WeeklyRewardsFrame);
-	else
-	C_AddOns.LoadAddOn("Blizzard_WeeklyRewards"); WeeklyRewardsFrame:Show()
-	end
-end)
+ns.tips("Add a Great Vault button to the dungeon page")
+local clear
+if PVEFrame and PVEFrame.NineSlice then
+	clear = CreateFrame("Button", "AddUISaveButton", PVEFrame.NineSlice, "UIPanelButtonTemplate")
+	clear:SetText("Great Vault")
+	clear:SetWidth(110)
+	clear:SetHeight(22)
+	clear:SetPoint("TOPLEFT", 57, 0)
+	clear:SetScript("OnClick", function()
+		if (WeeklyRewardsFrame and WeeklyRewardsFrame:IsShown()) then
+			HideUIPanel(WeeklyRewardsFrame);
+		else
+			C_AddOns.LoadAddOn("Blizzard_WeeklyRewards"); WeeklyRewardsFrame:Show()
+		end
+	end)
+end
 
-ns.tips("角色界面创建离开队伍按钮")
-local CHLP = CreateFrame("Button", "离开队伍", PaperDollItemsFrame, "UIPanelButtonTemplate")
-CHLP:SetText("退队")
-CHLP:SetWidth(50)
-CHLP:SetHeight(22)
-CHLP:SetPoint("BOTTOMLEFT", 7, 9)
-CHLP:SetScript("OnClick", function()
-	if IsInGroup() then
-		UIErrorsFrame:AddExternalWarningMessage(ERR_LEFT_GROUP_YOU)--https://wowpedia.fandom.com/wiki/UI_ERROR_MESSAGE
-	end
-	C_PartyInfo.LeaveParty()
-end)
+ns.tips("Add a leave-party button to the character sheet")
+local CHLP
+if PaperDollItemsFrame then
+	CHLP = CreateFrame("Button", "AddUICharLeaveParty", PaperDollItemsFrame, "UIPanelButtonTemplate")
+	CHLP:SetText("Leave")
+	CHLP:SetWidth(50)
+	CHLP:SetHeight(22)
+	CHLP:SetPoint("BOTTOMLEFT", 7, 9)
+	CHLP:SetScript("OnClick", function()
+		if IsInGroup() then
+			UIErrorsFrame:AddExternalWarningMessage(ERR_LEFT_GROUP_YOU)
+		end
+		C_PartyInfo.LeaveParty()
+	end)
+end
 
-ns.tips("地下城页面创建离开队伍按钮")
-local LFGLP = CreateFrame("Button", "离开队伍", PVEFrame, "UIPanelButtonTemplate")
-LFGLP:SetText("退队")
-LFGLP:SetWidth(50)
-LFGLP:SetHeight(22)
-LFGLP:SetPoint("BOTTOMLEFT", 10, 10)
-LFGLP:SetScript("OnClick", function()
-	if IsInGroup() then
-		UIErrorsFrame:AddExternalWarningMessage(ERR_LEFT_GROUP_YOU)--https://wowpedia.fandom.com/wiki/UI_ERROR_MESSAGE
-	end
-	C_PartyInfo.LeaveParty()
-end)
+ns.tips("Add a leave-party button to the dungeon page")
+local LFGLP
+if PVEFrame then
+	LFGLP = CreateFrame("Button", "AddUIPVELeaveParty", PVEFrame, "UIPanelButtonTemplate")
+	LFGLP:SetText("Leave")
+	LFGLP:SetWidth(50)
+	LFGLP:SetHeight(22)
+	LFGLP:SetPoint("BOTTOMLEFT", 10, 10)
+	LFGLP:SetScript("OnClick", function()
+		if IsInGroup() then
+			UIErrorsFrame:AddExternalWarningMessage(ERR_LEFT_GROUP_YOU)
+		end
+		C_PartyInfo.LeaveParty()
+	end)
+end
 
-ns.tips("删除自动输入DELETE")--exwind
+ns.tips("Auto-fill the DELETE confirmation")-- exwind
 local DELETE_STR = DELETE_ITEM_CONFIRM_STRING or "DELETE"
 local deletePopups = {
     DELETE_GOOD_ITEM        = true,
@@ -149,11 +163,12 @@ ns.hook("StaticPopup_Show", function(which, text, text_arg2, data)
 	end
 end)
 
---隐藏中间团队拾取框,鼠标会点不动
-GroupLootContainer:Hide()
+-- Hide the center group-loot frame; it swallows mouse clicks
+if GroupLootContainer then GroupLootContainer:Hide() end
 
---始终显示额外能量条的数值
+-- Always show the alternate power bar value
 ns.hook("UnitPowerBarAlt_SetUp", function(self)
+	if not self.statusFrame then return end
 	local statusFrame = self.statusFrame
 	if statusFrame.enabled then
 		statusFrame:Show()
@@ -161,17 +176,17 @@ ns.hook("UnitPowerBarAlt_SetUp", function(self)
 	end
 end)
 
---[网格界面校正] 
-SLASH_EA1 = "/ab" 
+--[Grid overlay alignment helper]
+SLASH_EA1 = "/ab"
 
 local f
 
 SlashCmdList["EA"] = function()
 	if f then
 		f:Hide()
-		f = nil		
+		f = nil
 	else
-		f = CreateFrame('Frame', nil, UIParent) 
+		f = CreateFrame('Frame', nil, UIParent)
 		f:SetAllPoints(UIParent)
 		local w = GetScreenWidth() / 64
 		local h = GetScreenHeight() / 36
@@ -194,88 +209,88 @@ SlashCmdList["EA"] = function()
 			end
 			t:SetPoint('TOPLEFT', f, 'TOPLEFT', 0, -i * h + 1)
 			t:SetPoint('BOTTOMRIGHT', f, 'TOPRIGHT', 0, -i * h - 1)
-		end	
+		end
 	end
 end
 
---预创建报错http://bbs.ngacn.cc/read.php?&tid=12561149&pid=245895632&to=1
-if GetLocale() == "zhCN" then 
-StaticPopupDialogs["LFG_LIST_ENTRY_EXPIRED_TOO_MANY_PLAYERS"] = { 
-text = "针对此项活动，你的队伍人数已满，将被移出列表。", 
-button1 = OKAY, 
-timeout = 0, 
-whileDead = 1, 
-preferredIndex = 3 
-} 
+-- Pre-create error text: http://bbs.ngacn.cc/read.php?&tid=12561149&pid=245895632&to=1
+if GetLocale() == "zhCN" then
+StaticPopupDialogs["LFG_LIST_ENTRY_EXPIRED_TOO_MANY_PLAYERS"] = {
+text = "Your group is full for this activity and will be removed from the listing.",
+button1 = OKAY,
+timeout = 0,
+whileDead = 1,
+preferredIndex = 3
+}
 end
---社区报错--eke提供
+-- Community UI error -- provided by eke
 GuildControlUIRankSettingsFrameRosterLabel = CreateFrame("Frame")
 GuildControlUIRankSettingsFrameRosterLabel:Hide()
-ns.tips("隐藏系统自带的界面NPC对话框")
--- TalkingHeadUI 属于 Blizzard_FrameXML 常驻加载,直接取消事件即可
+ns.tips("Hide the built-in talking-head NPC dialog")
+-- TalkingHeadUI ships with Blizzard_FrameXML and is always loaded, so just drop its events
 if TalkingHeadFrame then
 	TalkingHeadFrame:UnregisterAllEvents()
 end
 
 
-ns.tips("自动修理部分(优先使用公会修理)")
-local sessionGuildRepair = 0                                  -- 本次登录已使用的公修总额
+ns.tips("Auto repair (guild repair preferred)")
+local sessionGuildRepair = 0                                  -- guild repair already used this session
 ns.event("PLAYER_ENTERING_WORLD", function(isInitialLogin, isReloading)
 	if isInitialLogin or isReloading then
 		sessionGuildRepair = 0
 	end
 	if IsInGuild() then
 		QueryGuildBankTab(1)
-		local cost = GetRepairAllCost()                      -- 修理总费用
-		local gbwm = GetGuildBankWithdrawMoney()             -- 公会银行每日可取上限
-		local gbk = GetGuildBankMoney()                      -- 公会银行总金额
-		local canGuildRepair = CanGuildBankRepair()          -- 是否允许公会修理
+		local cost = GetRepairAllCost()                      -- total repair cost
+		local gbwm = GetGuildBankWithdrawMoney()             -- guild bank daily withdrawal cap
+		local gbk = GetGuildBankMoney()                      -- guild bank total gold
+		local canGuildRepair = CanGuildBankRepair()          -- whether guild repair is permitted
 	end
 end)
 ns.event("MERCHANT_SHOW", function()
 	if CanMerchantRepair() then
-		local cost = GetRepairAllCost()                      -- 修理总费用
-		local gbwm = GetGuildBankWithdrawMoney()             -- 公会银行每日可取上限（固定值，不会减少）
-		local gbk = GetGuildBankMoney()                      -- 公会银行总金额
-		local canGuildRepair = CanGuildBankRepair()          -- 是否允许公会修理
-		local money = GetMoney()                             -- 玩家当前的金钱
+		local cost = GetRepairAllCost()                      -- total repair cost
+		local gbwm = GetGuildBankWithdrawMoney()             -- guild bank daily cap (fixed, does not decrease)
+		local gbk = GetGuildBankMoney()                      -- guild bank total gold
+		local canGuildRepair = CanGuildBankRepair()          -- whether guild repair is permitted
+		local money = GetMoney()                             -- player's current gold
 		if cost > 0 then
-			-- 优先公会修理
+			-- Prefer guild repair
 			if IsInGuild() and canGuildRepair then
-				QueryGuildBankTab(1)                         -- 确保公会银行数据是最新的
+				QueryGuildBankTab(1)                         -- make sure guild bank data is current
 				local dailyRemaining = math.max(0, gbwm - sessionGuildRepair)
-				-- gbk 可能为 0（首次上线数据未到），此时忽略银行余额限制，只管每日上限
+				-- gbk may be 0 (data not loaded on first login); ignore the bank balance then, honor only the daily cap
 				local guildMoney = gbk > 0 and math.min(dailyRemaining, gbk) or dailyRemaining
 				if guildMoney >= cost then
 					RepairAllItems(true)
 					PlaySound("7994")
 					sessionGuildRepair = sessionGuildRepair + cost
-					print("|cff00FFFF本次使用公会维修：|r"..C_CurrencyInfo.GetCoinTextureString(cost))
+					print("|cff00FFFFRepaired using guild funds: |r"..C_CurrencyInfo.GetCoinTextureString(cost))
 					local newGbk = GetGuildBankMoney()
 					local newDailyRemaining = math.max(0, gbwm - sessionGuildRepair)
 					local remaining = newGbk > 0 and math.min(newGbk, newDailyRemaining) or newDailyRemaining
-					print("剩余可用公修：".. C_CurrencyInfo.GetCoinTextureString(remaining))
+					print("Guild repair remaining: ".. C_CurrencyInfo.GetCoinTextureString(remaining))
 					return
 				end
 			end
-			-- 公会修理不可用时，自费修理
+			-- Guild repair unavailable: pay for it yourself
 			if money > cost then
 				PlaySound("7994")
 				RepairAllItems()
 				local reason
 				if not IsInGuild() then
-					reason = "未加入公会"
+					reason = "not in a guild"
 				elseif not canGuildRepair then
-					reason = "无权限"
+					reason = "no permission"
 				elseif gbk > 0 and gbk < cost then
-					reason = "公会银行余额不足"
+					reason = "insufficient guild bank funds"
 				else
-					reason = "公会每日修理限额不足"
+					reason = "guild daily repair allowance exhausted"
 				end
-				print("|cffFF9900未使用公会修理: |r"..reason)
-				print("|cffFF0000自费修理：|r"..C_CurrencyInfo.GetCoinTextureString(cost))
+				print("|cffFF9900Guild repair not used: |r"..reason)
+				print("|cffFF0000Paid out of pocket: |r"..C_CurrencyInfo.GetCoinTextureString(cost))
 			else
-				print("|cff99CCFF".."没钱修装备了。".."|r")
+				print("|cff99CCFF".."Not enough gold to repair.".."|r")
 			end
 		end
 	end

@@ -1,5 +1,5 @@
 local _,ns = ...
-ns.tips("AH最低价秒杀按钮")
+ns.tips("Auction house lowest-price instant-buy button")
 do
     local e = CreateFrame("Frame")
 
@@ -79,9 +79,9 @@ do
         local price_string = C_CurrencyInfo.GetCoinTextureString(self.lowest_item.unitPrice)
         if not (itemName and price_string) then return nil end
         if succeed then
-            print(itemName.."购买成功1件：" .. price_string)
+            print(itemName.."Purchase succeeded, 1 item: " .. price_string)
         else
-            print(itemName.."购买失败，价格变化")
+            print(itemName.."Purchase failed, the price changed")
         end
     end
     
@@ -95,7 +95,7 @@ do
     function e:CreateBuyButton()
         local buy_button = CreateFrame("Button", "WA_AuctionLowPrice_BuyOne_Button", UIParent, "UIPanelButtonTemplate")
         buy_button:SetSize(150, 32)
-        buy_button:SetText("最低价秒一个")
+        buy_button:SetText("Insta-buy one at lowest price")
         buy_button:SetScript("OnClick", function() if e.lowest_item then e:BuyOneItem(e.lowest_item.itemID) end end)
         buy_button:SetFrameStrata("TOOLTIP")
         return buy_button

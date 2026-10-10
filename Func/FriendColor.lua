@@ -1,11 +1,11 @@
 ﻿local _,_,_,mygame = GetBuildInfo()
 local _,ns = ...
 if SocialUIFrame then
-	ns.tips("好友列表卡片重新布局")
+	ns.tips("Re-layout the friends list card")
 	ns.hook(FriendsListSocialCardMixin, "Initialize", function(self, node)
 		self:SetHeight(35)
 
-		-- 重排文字：一行 FriendName Name，二行 Level Class Location
+		-- Re-arrange the text: line 1 = FriendName + Name, line 2 = Level Class Location
 		self.FriendName:SetPoint("TOPLEFT", self.TextHolder, "TOPLEFT", 5, 8)
 		self.Name:ClearAllPoints()
 		self.Name:SetPoint("BOTTOMLEFT", self.FriendName, "BOTTOMRIGHT", 4, 0)
@@ -21,7 +21,7 @@ if SocialUIFrame then
 		self.Location:ClearAllPoints()
 		self.Location:SetPoint("TOPLEFT", self.FriendName, "BOTTOMLEFT", 0, -2)
 
-		-- Level、Class、realm 都用 Location 的颜色（FRIENDS_GRAY_COLOR）
+		-- Level, Class and realm all use the Location color (FRIENDS_GRAY_COLOR)
 		local gameAccountInfo = self.elementData and self.elementData.accountInfo and self.elementData.accountInfo.gameAccountInfo
 		if gameAccountInfo then
 			local parts = {}
@@ -33,7 +33,7 @@ if SocialUIFrame then
 			end
 		end
 
-		-- Name 改为职业颜色
+		-- Change Name to the class color
 		if gameAccountInfo and gameAccountInfo.characterName and gameAccountInfo.classFilename and gameAccountInfo.classFilename ~= "" then
 			local color = GetClassColorObj(gameAccountInfo.classFilename)
 			if color then
@@ -42,7 +42,7 @@ if SocialUIFrame then
 		end
 	end)
 
-	-- 可邀请时变绿色，其他情况恢复默认
+	-- Turn green when an invite is possible, otherwise restore the default
 	ns.hook(FriendsListSocialCardPartyButtonMixin, "RefreshIcon", function(btn)
 		if btn:IsEnabled() and not btn.isInGroup then
 			btn.ActionIcon:SetVertexColor(0,1,0)
@@ -51,7 +51,7 @@ if SocialUIFrame then
 		end
 	end)
 
-	-- 卡片间距减半，配合 SetHeight(35) 实现紧凑布局
+	-- Halve the card spacing; works together with SetHeight(35) for the compact layout
 	local view = SocialUIFrame and SocialUIFrame.FriendsList
 	if view and view.GetTemplateExtent then
 		local orig = view.GetTemplateExtent
@@ -64,7 +64,7 @@ if SocialUIFrame then
 		end
 	end
 
-	ns.tips("隐藏好友列表战网ID,点击时显示")
+	ns.tips("Hide the friends list Battle.net ID; show it on click")
 	local tagFrame = SocialUIFrame.BattleNetBar and SocialUIFrame.BattleNetBar.ControlsContainer and SocialUIFrame.BattleNetBar.ControlsContainer.PersonalBattleTagDisplay
 	if tagFrame and tagFrame.ShowBestDisplayTextAndButton then
 		local hidden = true
@@ -78,13 +78,13 @@ if SocialUIFrame then
 			tagFrame.CopyBattleTagToClipboardButton:SetShown(not hidden)
 		end)
 
-		-- 初始隐藏
+		-- Hide initially
 		tagFrame.DisplayText:Hide()
 		tagFrame.CopyBattleTagToClipboardButton:Hide()
 
-		-- Hook 暴雪的显示方法，根据 hidden 状态决定是否重新隐藏
-		-- 暴雪在 BN_CONNECTED/PLAYER_ENTERING_WORLD/FRAMES_LOADED 等事件中
-		-- 通过 RefreshElementVisibility → ShowBestDisplayTextAndButton 重新显示
+		-- Hook Blizzard's show method, and re-hide depending on the hidden state
+		-- Blizzard re-shows it via RefreshElementVisibility -> ShowBestDisplayTextAndButton
+		-- in events such as BN_CONNECTED / PLAYER_ENTERING_WORLD / FRAMES_LOADED
 		local origShow = tagFrame.ShowBestDisplayTextAndButton
 		tagFrame.ShowBestDisplayTextAndButton = function(self)
 			origShow(self)
@@ -96,8 +96,8 @@ if SocialUIFrame then
 	end
 end
 
--- 12.1 正式上线后可删除（已被 SocialUI 取代）
---隐藏好友列表战网ID,点击时显示
+-- Can be deleted once 12.1 goes live (superseded by SocialUI)
+-- Hide the friends list Battle.net ID; show it on click
 local HideBattleIDclick = true
 local HideBattleID = CreateFrame("Button", "HideBattleID", FriendsFrameBattlenetFrame);
 HideBattleID:SetAllPoints(FriendsFrameBattlenetFrame); 
@@ -117,7 +117,7 @@ FriendsFrameBattlenetFrame.Tag:HookScript("OnShow", function(self)
 	end
 end)
 
--- 12.1 正式上线后可删除（已被 SocialUI 取代）
+-- Can be deleted once 12.1 goes live (superseded by SocialUI)
 ns.hook("FriendsFrame_UpdateFriendButton", function(friendbutton)
 	if not FriendsListFrame or not FriendsListFrame:IsShown() then return end
 	if not friendbutton.id then return end
@@ -125,48 +125,48 @@ ns.hook("FriendsFrame_UpdateFriendButton", function(friendbutton)
 	local info = C_BattleNet.GetFriendAccountInfo(friendbutton.id)
 	if not info then return end
 	local accountInfo = info.gameAccountInfo
-	local areaName = accountInfo.areaName	--区域名
-	local realmDisplayName = accountInfo.realmDisplayName	--服务器
-	local characterName = accountInfo.characterName --角色名
-	local bnname = Ambiguate(info.battleTag,"short")	--战网名
-	local level = accountInfo.characterLevel	--等级
-	--local factionName = accountInfo.factionName--阵营
-	local gamename = accountInfo.wowProjectID	--游戏id,1是正式服,11是wlk
-	local rich = accountInfo.richPresence	--丰富返回游戏版本-区域-服务器
-	local timerunningSeasonID = accountInfo.timerunningSeasonID --赛季ID用于幻彩服务器
+	local areaName = accountInfo.areaName					-- area name
+	local realmDisplayName = accountInfo.realmDisplayName	-- realm
+	local characterName = accountInfo.characterName			-- character name
+	local bnname = Ambiguate(info.battleTag,"short")		-- Battle.net name
+	local level = accountInfo.characterLevel				-- level
+	--local factionName = accountInfo.factionName			-- faction
+	local gamename = accountInfo.wowProjectID				-- game id: 1 = retail, 11 = WotLK
+	local rich = accountInfo.richPresence					-- rich presence returns game version - area - realm
+	local timerunningSeasonID = accountInfo.timerunningSeasonID	-- season ID, used for Remix servers
 
-	--标题栏（直接用职业文件名索引 RAID_CLASS_COLORS，无需遍历）
+	-- Title bar (index RAID_CLASS_COLORS directly with the class filename, no iteration needed)
 	local classFilename = accountInfo.classFilename
 	local class = characterName and classFilename and RAID_CLASS_COLORS[classFilename]
 	if class then
 		friendbutton.name:SetText(format("%s|c%s (%s)|r    ", bnname, class.colorStr, characterName))
 	end
 
-	--信息栏（每次更新都重新设置，避免被暴雪默认文本覆盖）
+	-- Info bar (re-set on every update so Blizzard's default text doesn't overwrite it)
 	local infoText
 	if realmDisplayName and areaName and gamename == 1 then
-		if timerunningSeasonID then--如果在赛季服
+		if timerunningSeasonID then	-- if on a season server
 			infoText = format("|A:timerunning-glues-icon:12:12:0:0|a%s-%s-%s", areaName, realmDisplayName, level)
 		else
 			infoText = format("%s-%s-%s", areaName, realmDisplayName, level)
 		end
 	elseif areaName and gamename == 14 then
-		local _,fwq = strsplit("-",rich)	--怀旧服只要服务器名字
+		local _,fwq = strsplit("-",rich)	-- Classic servers only need the realm name
 		infoText = realmDisplayName and format("CTM-%s-%s-%s", areaName, realmDisplayName, level)
 			or (fwq and format("CTM-%s-%s-%s", areaName, fwq, level) or nil)
 	elseif areaName and gamename == 11 then
-		local _,fwq = strsplit("-",rich)	--怀旧服只要服务器名字
+		local _,fwq = strsplit("-",rich)	-- Classic servers only need the realm name
 		infoText = realmDisplayName and format("WLK-%s-%s-%s", areaName, realmDisplayName, level)
 			or (fwq and format("WLK-%s-%s-%s", areaName, fwq, level) or nil)
 	elseif areaName and gamename == 2 then
-		local _,fwq = strsplit("-",rich)	--怀旧服只要服务器名字
-		infoText = realmDisplayName and format("(怀旧60)-%s-%s-%s", areaName, realmDisplayName, level)
-			or (fwq and format("(怀旧60)-%s-%s-%s", areaName, fwq, level) or nil)
+		local _,fwq = strsplit("-",rich)	-- Classic servers only need the realm name
+		infoText = realmDisplayName and format("(Classic 60)-%s-%s-%s", areaName, realmDisplayName, level)
+			or (fwq and format("(Classic 60)-%s-%s-%s", areaName, fwq, level) or nil)
 	end
 	if infoText then
 		friendbutton.info:SetText(infoText)
 	end
-	--对比游戏版本
+	-- Compare game versions
 	if mygame > 90000 then
 		if not gamename or gamename == 1 then
 			friendbutton.name:SetAlpha(1)
@@ -177,8 +177,3 @@ ns.hook("FriendsFrame_UpdateFriendButton", function(friendbutton)
 		end
 	end
 end)
-
-
-
-
-

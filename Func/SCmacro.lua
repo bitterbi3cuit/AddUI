@@ -6,7 +6,7 @@ local ADCVAR,ADCVARCOPY
 ns.event('CVAR_UPDATE', function(event, msg, a)
 	if not ADCVAR then return end
 	local _,defcvar = C_CVar.GetCVarInfo(msg)
-	print(msg,a,"默认值:",defcvar)--打印具体改变的cvar
+	print(msg,a,"Default value:",defcvar) -- Print the specific changed CVar
 	if not ADCVARCOPY then return end
 	local text = 'SetCVar("'..msg..'", '..a..')'
 	ChatFrame_OpenChat(text, SELECTED_DOCK_FRAME)
@@ -15,17 +15,18 @@ SlashCmdList["PRINTCVAR"] = function(msg)
 	ADCVAR = not ADCVAR
 	if msg ~= "" and ADCVAR then
 		ADCVARCOPY = ADCVAR
-		print("|cff3cff00已开启CVar打印和复制")
+		print("|cff3cff00CVar printing and copying enabled")
 	elseif ADCVAR then
-		print("|cff3cff00已开启CVar打印")
+		print("|cff3cff00CVar printing enabled")
 	else
 		ADCVARCOPY = ADCVAR
-		print("|cffff5900CVar打印已关闭")
+		print("|cffff5900CVar printing disabled")
 	end
 end
 SLASH_PRINTCVAR1 = "/adc"
---界面自动化
--- SCV：备份原始值 + 设置 CVar（仅首次备份，后续添加只需改这一处）
+
+-- UI Automation
+-- SCV: Backup original value + set CVar (only backs up on first call; add new entries here only)
 local function SCV(name, value)
 	if not AddUIDB.MYCVAR then AddUIDB.MYCVAR = {} end
 	if AddUIDB.MYCVAR[name] == nil then
@@ -33,7 +34,7 @@ local function SCV(name, value)
 	end
 	C_CVar.SetCVar(name, value)
 end
--- SCVS：备份原始值 + 设置 Settings（同上）
+-- SCVS: Backup original value + set Settings (same as above)
 local function SCVS(name, value)
 	if not AddUIDB.MYCVAR then AddUIDB.MYCVAR = {} end
 	if AddUIDB.MYCVAR[name] == nil then
@@ -44,242 +45,245 @@ end
 
 local function uiconfig()
 
-	--恢复默认
-	--InterfaceOptionsFrame_SetAllToDefaults()
---其他
-SCV("UnitNamePlayerPVPTitle", 1)	--头衔
-SCV("UnitNamePlayerGuild",1)	--公会名
-SCV("UnitNameGuildTitle", 1)	--公会会阶
-SCV("chatStyle","im")	--聊天风格-即时通讯风格"classic","im"
+	-- Restore defaults
+	-- InterfaceOptionsFrame_SetAllToDefaults()
+
+-- General
+SCV("UnitNamePlayerPVPTitle", 1)	-- Title
+SCV("UnitNamePlayerGuild",1)		-- Guild name
+SCV("UnitNameGuildTitle", 1)		-- Guild rank
+SCV("chatStyle","im")				-- Chat style - instant messaging style: "classic", "im"
 if AddUIDB.MYCVAR["C_Container.SetSortBagsRightToLeft"] == nil then AddUIDB.MYCVAR["C_Container.SetSortBagsRightToLeft"] = C_Container.GetSortBagsRightToLeft() end
-C_Container.SetSortBagsRightToLeft(true)	--正序整理背包，反序改成false
+C_Container.SetSortBagsRightToLeft(true)	-- Sort bags left-to-right; change to false for right-to-left
 if AddUIDB.MYCVAR["C_Container.SetInsertItemsLeftToRight"] == nil then AddUIDB.MYCVAR["C_Container.SetInsertItemsLeftToRight"] = C_Container.GetInsertItemsLeftToRight() end
-C_Container.SetInsertItemsLeftToRight(true)	--新物品放在最右侧背包，左侧改成false
-SCV("floatingCombatTextCombatDamageDirectionalScale_v2", 0)--伤害数字显示在血条上方,改数字0123456789
-SCV("WorldTextScale_v2", 2)								--战斗伤害字体大小
-SCV("floatingCombatTextCombatDamage_v2", 1)				--显示伤害数字
-SCV("floatingCombatTextCombatHealing_v2", 1)			--显示治疗数字
-SCV("enableFloatingCombatText",  0)						--滚动战斗记录
-SCV("floatingCombatTextFloatMode",  1)					--滚动方向
-SCV("floatingCombatTextAuras", 0)  						--光环
-SCV("floatingCombatTextComboPoints", 0) 				--連擊點 
-SCV("floatingCombatTextEnergyGains", 0) 				--資源獲得(法力、怒氣、能量、真氣，和連擊點不同) 
-SCV("floatingCombatTextPeriodicEnergyGains", 0)   		--周期性能量   
-SCV("floatingCombatTextHonorGains", 1)   				--榮譽擊殺 
-SCV("floatingCombatTextRepChanges", 0)   				--聲望變化
-SCV("floatingCombatTextPetMeleeDamage", 1)   			--普攻 
-SCV("floatingCombatTextPetSpellDamage", 1)  			--技能 
-SCV("floatingCombatTextCombatHealingAbsorbTarget", 1)	--對目標上盾/護甲提示 
-SCV("floatingCombatTextCombatHealingAbsorbSelf", 1) 	--自身得盾/護甲提示 
-SCV("floatingCombatTextCombatDamageAllAutos", 1) 	  	--顯示所有的白字 
-SCV("floatingCombatTextDodgeParryMiss", 1)   			--閃招 
-SCV("floatingCombatTextDamageReduction", 1)  			--傷害減免/抵抗 
-SCV("floatingCombatTextCombatLogPeriodicSpells", 1) 	--周期性傷害 
-SCV("floatingCombatTextReactives", 1)   				--法術警示 
-SCV("floatingCombatTextSpellMechanics", 0)				--顯示目標受到的糾纏效果，(例如 誘補(xxxx-xxxx)，沉默緩速之類) 
-SCV("floatingCombatTextSpellMechanicsOther", 0)  		--顯示其他玩家受到的糾纏效果 
-SCV("floatingCombatTextCombatState", 0)   				--進入/離開戰鬥文字提示 
-SCV("floatingCombatTextLowManaHealth", 0)   			--低MP/低HP文字提示 
-SCV("floatingCombatTextFriendlyHealers", 0)   			--友方治療者名稱 
+C_Container.SetInsertItemsLeftToRight(true)	-- New items go to the rightmost bag; change to false for leftmost
+SCV("floatingCombatTextCombatDamageDirectionalScale_v2", 0) -- Damage numbers shown above health bar; change number 0-9
+SCV("WorldTextScale_v2", 2)								-- Combat damage font size
+SCV("floatingCombatTextCombatDamage_v2", 1)				-- Show damage numbers
+SCV("floatingCombatTextCombatHealing_v2", 1)			-- Show healing numbers
+SCV("enableFloatingCombatText",  0)						-- Scrolling combat text
+SCV("floatingCombatTextFloatMode",  1)					-- Scroll direction
+SCV("floatingCombatTextAuras", 0)  						-- Auras
+SCV("floatingCombatTextComboPoints", 0) 				-- Combo points
+SCV("floatingCombatTextEnergyGains", 0) 				-- Resource gains (mana, rage, energy, chi — different from combo points)
+SCV("floatingCombatTextPeriodicEnergyGains", 0)   		-- Periodic energy gains
+SCV("floatingCombatTextHonorGains", 1)   				-- Honorable kills
+SCV("floatingCombatTextRepChanges", 0)   				-- Reputation changes
+SCV("floatingCombatTextPetMeleeDamage", 1)   			-- Auto attacks
+SCV("floatingCombatTextPetSpellDamage", 1)  			-- Abilities
+SCV("floatingCombatTextCombatHealingAbsorbTarget", 1)	-- Shield/armor applied to target
+SCV("floatingCombatTextCombatHealingAbsorbSelf", 1) 	-- Shield/armor applied to self
+SCV("floatingCombatTextCombatDamageAllAutos", 1) 	  	-- Show all white damage
+SCV("floatingCombatTextDodgeParryMiss", 1)   			-- Dodge/Parry/Miss
+SCV("floatingCombatTextDamageReduction", 1)  			-- Damage reduction/resistance
+SCV("floatingCombatTextCombatLogPeriodicSpells", 1) 	-- Periodic damage
+SCV("floatingCombatTextReactives", 1)   				-- Spell alerts
+SCV("floatingCombatTextSpellMechanics", 0)				-- Show crowd control effects on target (e.g. Entrap(xxxx-xxxx), silence, slow)
+SCV("floatingCombatTextSpellMechanicsOther", 0)  		-- Show crowd control effects on other players
+SCV("floatingCombatTextCombatState", 0)   				-- Enter/leave combat text notification
+SCV("floatingCombatTextLowManaHealth", 0)   			-- Low MP/HP text notification
+SCV("floatingCombatTextFriendlyHealers", 0)   			-- Friendly healer names
 
+SCV("xpBarText", 1) -- Experience bar
+SCV("statusText",1) -- Status text
 
-SCV("xpBarText", 1) --经验条
-SCV("statusText",1) --状态文字
+-- Clock
+	SCV("timeMgrAlarmEnabled",0) -- Disable clock alarm
+	SCV("timeMgrUseMilitaryTime",1)	-- 24-hour mode
+	SCV("timeMgrUseLocalTime",1)	-- Use local time
 
+-- Controls
+	SCV("deselectOnClick",0) -- Target lock
+	SCV("autoDismountFlying",1) -- Auto dismount from flying
+	SCV("autoClearAFK",1) -- Auto clear AFK status
+	SCV("interactOnLeftClick",1) -- Left-click to interact
+	SCV("lootUnderMouse",1) -- Open loot window at mouse position
+	SCV("autoLootDefault",1) -- Auto loot
+	SCV("combinedBags",1)	-- Combined bags
+	-- Camera
+	SCV("cameraWaterCollision",0) -- Water collision
+	SCV("cameraSmoothStyle",0) -- Camera follow mode
+	SCV("SoftTargetInteract",3) -- Enable interact key
 
---时钟
-	SCV("timeMgrAlarmEnabled",0) --关闭时钟提醒
-	SCV("timeMgrUseMilitaryTime",1)	--24小时模式
-	SCV("timeMgrUseLocalTime",1)	--使用本地时间
-
---控制
-	SCV("deselectOnClick",0) --目标锁定
-    SCV("autoDismountFlying",1) --自动取消飞行
-	SCV("autoClearAFK",1) --自动解除离开状态
-	SCV("interactOnLeftClick",1) --左键点击操作
-	SCV("lootUnderMouse",1) --鼠标位置打开拾取框
-	SCV("autoLootDefault",1) --自动拾取
-	SCV("combinedBags",1)	--组合背包
-	--镜头
-	SCV("cameraWaterCollision",0)--水体碰撞
-    SCV("cameraSmoothStyle",0) --镜头跟随模式
-	SCV("SoftTargetInteract",3)--开启交互键
---界面
-	--显示
-	SCV("hideAdventureJournalAlerts","none")	--隐藏冒险指南
+-- Interface
+	-- Display
+	SCV("hideAdventureJournalAlerts","none")	-- Hide adventure guide alerts
 	SCV("showTutorials",0)
-	SCV("statusText",1) --状态文字
-    SCV("statusTextDisplay","NUMERIC")--头像状态文字形式："NUMERIC"数值"PERCENT"百分比"BOTH"同时显示
-	SCV("chatBubbles",1)--聊天泡泡
-	SCV("chatBubblesParty",1)--小队聊天泡泡
-	SCV("chatBubblesRaid",1)--团队聊天泡泡
-	--团队界面配置
-	SCV("useCompactPartyFrames",1) --使用团队风格的小队框体界面
-	SCV("raidFramesDisplayPowerBars",1)	--显示能量条
-	SCV("raidFramesDisplayOnlyHealerPowerBars",0)	--只显示治疗能量条
-	SCV("raidFramesDisplayIncomingHeals",1)	--预计治疗
-	SCV("raidFramesDisplayAggroHighlight",1)	--高亮仇恨目标
-	SCV("raidFramesDisplayClassColor",1)	--职业颜色
-	SCV("raidOptionDisplayPets",0)	--显示宠物
-	SCV("raidOptionDisplayMainTankAndAssist",0)	--主坦克主助理
-	SCV("raidFramesDisplayDebuffs",1)	--显示负面效果
-	SCV("raidFramesDisplayLargerRoleSpecificDebuffs",1)--放大职责减益
-	SCV("raidFramesDisplayOnlyDispellableDebuffs",0)	--只显示可供驱散的负面效果
-	SCV("raidFramesDisplayBigDefensive",1)--重要防御技能居中
-	SCV("raidFramesDispellndicatorType",2)--可驱散减益指示器
-	SCV("raidFramesDispellndicatorOverlay",0)--可驱散减益颜色
-	SCV("raidFramesHealthText","none")	--生命值
-	SCV("pvpFramesDisplayPowerBars",1)	--竞技场对手框能量条
-	SCV("pvpFramesDisplayOnlyHealerPowerBars",0)	--竞技场对手框仅显示治疗能量条
-	SCV("pvpFramesDisplayClassColor",1)	--竞技场对手框能量条
-	
---动作条
-    --SHOW_MULTI_ACTIONBAR_1="1" --左下方动作条
-    --SHOW_MULTI_ACTIONBAR_2="0" --右下方动作条
-	--SHOW_MULTI_ACTIONBAR_3="1" --右侧右边动作条
-	--SHOW_MULTI_ACTIONBAR_4="1" --右侧左边动作条
-	-- 显示动作条2-5
-   --local bar1, bar2, bar3, bar4, _, _, _ = GetActionBarToggles()
-   --if (not bar1 or not bar2 or not bar3 or not bar4) then
-		--Settings.SetValue("PROXY_SHOW_ACTIONBAR_1", true)
-        SCVS("PROXY_SHOW_ACTIONBAR_2", true)
-        SCVS("PROXY_SHOW_ACTIONBAR_3", false)
-        SCVS("PROXY_SHOW_ACTIONBAR_4", true)
-        SCVS("PROXY_SHOW_ACTIONBAR_5", true)
+	SCV("statusText",1) -- Status text
+	SCV("statusTextDisplay","NUMERIC") -- Portrait status text format: "NUMERIC" value, "PERCENT" percentage, "BOTH" both
+	SCV("chatBubbles",1)		-- Chat bubbles
+	SCV("chatBubblesParty",1)	-- Party chat bubbles
+	SCV("chatBubblesRaid",1)	-- Raid chat bubbles
+	-- Raid frame configuration
+	SCV("useCompactPartyFrames",1) -- Use raid-style party frames
+	SCV("raidFramesDisplayPowerBars",1)		-- Show power bars
+	SCV("raidFramesDisplayOnlyHealerPowerBars",0)	-- Show only healer power bars
+	SCV("raidFramesDisplayIncomingHeals",1)		-- Incoming heals
+	SCV("raidFramesDisplayAggroHighlight",1)	-- Highlight aggro target
+	SCV("raidFramesDisplayClassColor",1)		-- Class colors
+	SCV("raidOptionDisplayPets",0)				-- Show pets
+	SCV("raidOptionDisplayMainTankAndAssist",0)	-- Main tank and main assist
+	SCV("raidFramesDisplayDebuffs",1)			-- Show debuffs
+	SCV("raidFramesDisplayLargerRoleSpecificDebuffs",1) -- Enlarge role-specific debuffs
+	SCV("raidFramesDisplayOnlyDispellableDebuffs",0)	-- Show only dispellable debuffs
+	SCV("raidFramesDisplayBigDefensive",1)		-- Center important defensive cooldowns
+	SCV("raidFramesDispellndicatorType",2)		-- Dispellable debuff indicator type
+	SCV("raidFramesDispellndicatorOverlay",0)	-- Dispellable debuff indicator color
+	SCV("raidFramesHealthText","none")			-- Health text
+	SCV("pvpFramesDisplayPowerBars",1)				-- Arena enemy frame power bars
+	SCV("pvpFramesDisplayOnlyHealerPowerBars",0)	-- Arena enemy frame: show only healer power bars
+	SCV("pvpFramesDisplayClassColor",1)				-- Arena enemy frame class colors
+
+-- Action bars
+	-- SHOW_MULTI_ACTIONBAR_1="1" -- Bottom-left action bar
+	-- SHOW_MULTI_ACTIONBAR_2="0" -- Bottom-right action bar
+	-- SHOW_MULTI_ACTIONBAR_3="1" -- Right side, right action bar
+	-- SHOW_MULTI_ACTIONBAR_4="1" -- Right side, left action bar
+	-- Show action bars 2-5
+	-- local bar1, bar2, bar3, bar4, _, _, _ = GetActionBarToggles()
+	-- if (not bar1 or not bar2 or not bar3 or not bar4) then
+		-- Settings.SetValue("PROXY_SHOW_ACTIONBAR_1", true)
+		SCVS("PROXY_SHOW_ACTIONBAR_2", true)
+		SCVS("PROXY_SHOW_ACTIONBAR_3", false)
+		SCVS("PROXY_SHOW_ACTIONBAR_4", true)
+		SCVS("PROXY_SHOW_ACTIONBAR_5", true)
 		SCVS("PROXY_SHOW_ACTIONBAR_6", false)
 		SCVS("PROXY_SHOW_ACTIONBAR_7", false)
 		SCVS("PROXY_SHOW_ACTIONBAR_8", false)
-    --end
-	--刷新动作条
-	--MultiActionBar_Update()
-    --StatusTrackingBarManager:UpdateBarTicks()
-    --EventRegistry:TriggerEvent("ActionBarShownSettingUpdated")
-	
-	SCV("lockActionBars",1)--锁定动作条
-	
-	SCV("alwaysShowActionBars",1)--始终显示动作条
-    SCV("countdownForCooldowns",1) --显示冷却时间
+	-- end
+	-- Refresh action bars
+	-- MultiActionBar_Update()
+	-- StatusTrackingBarManager:UpdateBarTicks()
+	-- EventRegistry:TriggerEvent("ActionBarShownSettingUpdated")
 
+	SCV("lockActionBars",1)			-- Lock action bars
+	SCV("alwaysShowActionBars",1)	-- Always show action bars
+	SCV("countdownForCooldowns",1)	-- Show cooldown countdown
 
---战斗
-	SCV("nameplateShowSelf",1) --显示个人资源
-	SCV("nameplateResourceOnTarget",0) --在敌方目标显示玩家资源
-    SCV("showTargetOfTarget",1) --目标的目标
-    SCV("doNotFlashLowHealthWarning",1) --生命值过低时不闪烁屏幕
-    SCV("lossOfControl",1) --失控警报
-	SCV("enableFloatingCombatText",  0)	--滚动战斗记录
-	SCV("enableMouseoverCast", 1)--鼠标悬停施法
-	SCV("autoSelfCast",1) --自动自我施法
+-- Combat
+	SCV("nameplateShowSelf",1) -- Show personal resource display
+	SCV("nameplateResourceOnTarget",0) -- Show player resource on enemy target
+	SCV("showTargetOfTarget",1) -- Target of target
+	SCV("doNotFlashLowHealthWarning",1) -- Don't flash screen at low health
+	SCV("lossOfControl",1) -- Loss of control alerts
+	SCV("enableFloatingCombatText",  0)	-- Scrolling combat text
+	SCV("enableMouseoverCast", 1) -- Mouseover casting
+	SCV("autoSelfCast",1) -- Auto self-cast
 
+-- Social
+	SCV("profanityFilter",0) -- Profanity filter
+	SCV("spamFilter",0) -- Spam filter
+	SCV("guildMemberNotify",0) -- Guild member notifications
+	SCV("showToastBroadcast",1) -- Broadcast updates
+	SCV("showToastWindow",0) -- Show toast window
+	SCV("showTimestamps","none") -- Chat timestamps
+	SCV("whisperMode","inline")	-- New whisper mode
 
---社交
-    SCV("profanityFilter",0) --语言过滤器
-    SCV("spamFilter",0) --垃圾信息过滤
-    SCV("guildMemberNotify",0) --公会成员提示
-    SCV("showToastBroadcast",1) --通告更新
-    SCV("showToastWindow",0) --显示浮窗
-    SCV("showTimestamps","none") --聊天时间戳
-	SCV("whisperMode","inline")	--新的悄悄话
---信号
-	SCV("enablePings",1)	--开启信号
-	
---游戏增强
-	SCV("combatWarningsEnabled",1)	--首领警报
-	SCV("encounterWarningsEnabled",1)--文字警报
-	SCV("encounterTimelineEnabled",1)--首领时间轴
-	SCV("encounterTimelinelocnographyEnabled",1)--法术辅助图标
-	SCV("cooldownViewerEnabled",1)--冷却管理器
-	SCV("externalDefensivesEnabled",1)--外部防御技能
-	SCV("damageMeterEnabled", 1)--伤害统计
-	SCV("spellDiminishPVPEnemiesEnabled",1)--收益递减追踪
-	
---姓名版
-	SCV("UnitNameOwn",1) --我的名字
-	SCV("UnitNameFriendlySpecialNPCName", 0);
-	SCV("UnitNameHostleNPC", 0);
-	SCV("UnitNameInteractiveNPC", 0);
-	SCV("UnitNameNPC", 1);
-	SCV("ShowQuestUnitCircles", 1);
-	SCV("UnitNameNonCombatCreatureName",1) --小动物小伙伴
-	SCV("UnitNameFriendlyPlayerName",1) --友方玩家
-	SCV("UnitNameFriendlyMinionName",0) --友方玩家仆从
-	SCV("UnitNameEnemyPlayerName",1) --敌对玩家
-	SCV("UnitNameEnemyMinionName",1) --敌对玩家仆从
-	SCV("nameplateShowFriends",0) --友方玩家血条
-	SCV("nameplateShowFriendlyMinions",0) --友方玩家仆从血条
-	SCV("nameplateShowEnemies",1) --敌对玩家血条
-	SCV("nameplateShowEnemyMinions",1) --敌对玩家仆从血条
-	SCV("nameplateShowEnemyMinus",1) --敌对玩家杂兵血条
-	SCV("nameplateShowAll",1) --显示所有姓名版
-	SCV("nameplateShowFriendlyNpcs",1) --友方NPC姓名版
-	SCV("nameplateShowOffscreen",1) --屏幕外姓名版
-	SCV("nameplateInfoDisplay","D") --姓名版信息
-	SCV("nameplateCastBarDisplay","O") --施法条信息
-	SCV("nameplateThreatDisplay","B") --仇恨显示
-	SCV("nameplateEnemyNpcAuraDisplay","G") --敌方NPC减益状态
-	SCV("nameplateEnemyPlayerAuraDisplay","G") --敌方玩家减益状态
-	SCV("nameplateFriendlyPlayerAuraDisplay","G") --友方玩家减益状态
-	SCV("nameplateSimplifiedTypes","") --简化姓名版
-	
-    --NamePlateDriverFrame:UpdateNamePlateOptions() 
---综合
-	SCV("WorldTextMinSize",12)	--名字尺寸
-	SCV("CameraKeepCharacterCentered",0)	--动态眩晕
-	SCV("CameraReduceUnexpectedMovement",1)	--动态眩晕
-	SCV("ShakeStrengthCamera",0)	--视角晃动
-	SCV("ShakeStrengthUI",0)	--视角晃动
-	SCV("empowerTapControls",1)	--蓄力法术
-	SCV("spellActivationOverlayOpacity",0.6)	--法术警报不透明度
---色盲模式
+-- Pings
+	SCV("enablePings",1) -- Enable pings
+
+-- Game Enhancements
+	SCV("combatWarningsEnabled",1)				-- Boss alerts
+	SCV("encounterWarningsEnabled",1)			-- Text alerts
+	SCV("encounterTimelineEnabled",1)			-- Boss timeline
+	SCV("encounterTimelinelocnographyEnabled",1)-- Spell assist icons
+	SCV("cooldownViewerEnabled",1)				-- Cooldown tracker
+	SCV("externalDefensivesEnabled",1)			-- External defensive cooldowns
+	SCV("damageMeterEnabled", 1)				-- Damage meter
+	SCV("spellDiminishPVPEnemiesEnabled",1)		-- Diminishing returns tracker
+
+-- Nameplates
+	SCV("UnitNameOwn",1) -- My own name
+	SCV("UnitNameFriendlySpecialNPCName", 0)
+	SCV("UnitNameHostleNPC", 0)
+	SCV("UnitNameInteractiveNPC", 0)
+	SCV("UnitNameNPC", 1)
+	SCV("ShowQuestUnitCircles", 1)
+	SCV("UnitNameNonCombatCreatureName",1) -- Critters and companions
+	SCV("UnitNameFriendlyPlayerName",1) -- Friendly player names
+	SCV("UnitNameFriendlyMinionName",0) -- Friendly player minion names
+	SCV("UnitNameEnemyPlayerName",1) -- Enemy player names
+	SCV("UnitNameEnemyMinionName",1) -- Enemy player minion names
+	SCV("nameplateShowFriends",0) -- Friendly player health bars
+	SCV("nameplateShowFriendlyMinions",0) -- Friendly player minion health bars
+	SCV("nameplateShowEnemies",1) -- Enemy player health bars
+	SCV("nameplateShowEnemyMinions",1) -- Enemy player minion health bars
+	SCV("nameplateShowEnemyMinus",1) -- Enemy player trivial health bars
+	SCV("nameplateShowAll",1) -- Show all nameplates
+	SCV("nameplateShowFriendlyNpcs",1) -- Friendly NPC nameplates
+	SCV("nameplateShowOffscreen",1) -- Off-screen nameplates
+	SCV("nameplateInfoDisplay","D") -- Nameplate info display
+	SCV("nameplateCastBarDisplay","O") -- Cast bar display
+	SCV("nameplateThreatDisplay","B") -- Threat display
+	SCV("nameplateEnemyNpcAuraDisplay","G") -- Enemy NPC debuff display
+	SCV("nameplateEnemyPlayerAuraDisplay","G") -- Enemy player debuff display
+	SCV("nameplateFriendlyPlayerAuraDisplay","G") -- Friendly player debuff display
+	SCV("nameplateSimplifiedTypes","") -- Simplified nameplates
+
+	-- NamePlateDriverFrame:UpdateNamePlateOptions()
+
+-- Miscellaneous
+	SCV("WorldTextMinSize",12)				-- Name font size
+	SCV("CameraKeepCharacterCentered",0)	-- Dynamic camera centering
+	SCV("CameraReduceUnexpectedMovement",1)	-- Reduce unexpected camera movement
+	SCV("ShakeStrengthCamera",0)			-- Camera shake
+	SCV("ShakeStrengthUI",0)				-- UI shake
+	SCV("empowerTapControls",1)				-- Empowered spell tap controls
+	SCV("spellActivationOverlayOpacity",0.6) -- Spell alert overlay opacity
+
+-- Color blind mode
 	SCV("colorblindMode",0)
-	
---易用性
-    SCV("speechToText",0)	--语音转文本
-	SCV("textToSpeech",0)	--文本转语音
-	SCV("remoteTextToSpeech",0)	--在语音聊天中为我发言
---坐骑
-	SCV("motionSicknessLandscapeDarkening",0)	--晕动症
-	SCV("DisableAdvancedFlyingFullScreenEffects",1)	--动态飞行屏幕效果
-	SCV("DisableAdvancedFlyingVelocityVFX",1)	--动态飞行速度效果
-	SCV("advFlyPitchControl",3)				--仰角控制
-	SCV("advFlyPitchControlGroundDebounce",1)	--防抖倾角输入
---系统相关
---图形
-	SCV("useUiScale", 1)	--启用UI缩放
-	SCV("uiScale", 0.75)	--UI缩放
-	SCV("cameraFov", 90)	--镜头视野范围
---音频
-	SCV("Sound_MasterVolume", 0.3)	--主音量
-	SCV("Sound_MusicVolume", 0)	--音乐
-	SCV("Sound_SFXVolume", 0.25)	--效果
-	SCV("Sound_AmbienceVolume", 0.1)	--环境音
-	SCV("Sound_DialogVolume", 0.5)	--对话
-	SCV("Sound_EnableErrorSpeech", 0)	--错误提示音
-	SCV("Sound_EnableSoundWhenGameIsInBG", 1)	--背景声音
 
-print("|cff00BFFFAddUI:|r已设置界面配置,/sdold可以恢复之前的设定")
+-- Accessibility
+	SCV("speechToText",0)		-- Speech to text
+	SCV("textToSpeech",0)		-- Text to speech
+	SCV("remoteTextToSpeech",0)	-- Speak for me in voice chat
+
+-- Mounts
+	SCV("motionSicknessLandscapeDarkening",0)		-- Motion sickness darkening
+	SCV("DisableAdvancedFlyingFullScreenEffects",1)	-- Dynamic flying fullscreen effects
+	SCV("DisableAdvancedFlyingVelocityVFX",1)		-- Dynamic flying velocity effects
+	SCV("advFlyPitchControl",3)						-- Pitch control
+	SCV("advFlyPitchControlGroundDebounce",1)		-- Pitch input debounce
+
+-- System
+-- Graphics
+	SCV("useUiScale", 1)	-- Enable UI scaling
+	SCV("uiScale", 0.75)	-- UI scale
+	SCV("cameraFov", 90)	-- Camera field of view
+
+-- Audio
+	SCV("Sound_MasterVolume", 0.3)		-- Master volume
+	SCV("Sound_MusicVolume", 0)			-- Music
+	SCV("Sound_SFXVolume", 0.25)		-- Sound effects
+	SCV("Sound_AmbienceVolume", 0.1)	-- Ambient sounds
+	SCV("Sound_DialogVolume", 0.5)		-- Dialog
+	SCV("Sound_EnableErrorSpeech", 0)	-- Error speech
+	SCV("Sound_EnableSoundWhenGameIsInBG", 1) -- Play sound when game is in background
+
+print("|cff00BFFFAddUI:|r UI configuration applied. Use /sdold to restore previous settings.")
 end
---SetCVar("",)
+-- SetCVar("",)
 
---界面自动化命令 
-SlashCmdList["UICONFIGG"] = function() uiconfig() end 
+-- UI automation commands
+SlashCmdList["UICONFIGG"] = function() uiconfig() end
 SLASH_UICONFIGG1 = "/sd"
 SLASH_UICONFIGG2 = "/sdd"
 
---从备份恢复 CVar
+-- Restore CVars from backup
 local function restoreCVar()
 	if not AddUIDB.MYCVAR or not next(AddUIDB.MYCVAR) then
-		print("|cffff5900没有已保存的CVar备份")
+		print("|cffff5900No saved CVar backup found")
 		return
 	end
 	local count = 0
 	for name, value in pairs(AddUIDB.MYCVAR) do
 		if name:find("^PROXY_") then
-			-- Settings 值，转换回布尔类型
+			-- Settings value — convert back to boolean
 			local boolVal = value == "true" or value == "1"
 			Settings.SetValue(name, boolVal)
 		elseif name:find("^C_Container") then
-			-- C_Container 方法调用
+			-- C_Container method call
 			local method = name:match("%.([^.]+)$")
 			if method and C_Container[method] then
 				C_Container[method](value)
@@ -289,24 +293,23 @@ local function restoreCVar()
 		end
 		count = count + 1
 	end
-	print("|cff00BFFFAddUI:|r已恢复"..count.."个CVar设置")
+	print("|cff00BFFFAddUI:|r Restored "..count.." CVar settings")
 end
 SlashCmdList["RESTORECVAR"] = function() restoreCVar() end
 SLASH_RESTORECVAR1 = "/sdold"
 
---选择编辑模式配置3
+-- Select edit mode layout 3
 SlashCmdList["EDITMODE"] = function()
-EditModeManagerFrame:SelectLayout(3)
-end 
+	EditModeManagerFrame:SelectLayout(3)
+end
 SLASH_EDITMODE1 = "/ed"
 SLASH_EDITMODE2 = "/edd"
 
-
---恢复默认按键
+-- Reset default keybindings
 local function Bindings()
 	LoadBindings(DEFAULT_BINDINGS)
 	SaveBindings(1)
-	--设置几个默认的
+	-- Set a few specific defaults
 	SetBinding("F12","REPLY")
 	SetBinding("F11","REPLY2")
 	SetBinding("F9","TOGGLEAUTORUN")
@@ -314,47 +317,48 @@ local function Bindings()
 	SetBinding("D","STRAFERIGHT")
 end
 
---删除所有宏
+-- Delete all macros
 local function UIcfg()
-	for i = 1,9999 do 
+	for i = 1,9999 do
 		local t=10000-i
-		DeleteMacro(t)   --删除所有宏
-	end 
-end 
-
------删除宏和按键
-StaticPopupDialogs.SC_MACRO = { 
-        text = "你确定要删除所有宏并恢复默认按键？", 
-        button1 = ACCEPT, 
-        button2 = CANCEL, 
-		--功能调用
-        OnAccept =  function() Bindings(); UIcfg() end, 
-        timeout = 0, 
-        whileDead = 1, 
-        hideOnEscape = true, 
-        preferredIndex = 5, 
-}
---斜杠线命令
-SLASH_SCMACRO1 = "/sc" 
-SLASH_SCMACRO2 = "/SC" 
-SlashCmdList["SCMACRO"] = function() 
-        StaticPopup_Show("SC_MACRO") 
+		DeleteMacro(t) -- Delete all macros
+	end
 end
------删除宏
-StaticPopupDialogs.SH_MACROO = { 
-        text = "你确定要删除所有宏？", 
-        button1 = ACCEPT, 
-        button2 = CANCEL, 
-		--功能调用
-        OnAccept =  function() UIcfg() end, 
-        timeout = 0, 
-        whileDead = 1, 
-        hideOnEscape = true, 
-        preferredIndex = 5, 
+
+-- Delete macros and reset keybindings dialog
+StaticPopupDialogs.SC_MACRO = {
+	text = "Are you sure you want to delete all macros and reset default keybindings?",
+	button1 = ACCEPT,
+	button2 = CANCEL,
+	-- Function calls
+	OnAccept = function() Bindings(); UIcfg() end,
+	timeout = 0,
+	whileDead = 1,
+	hideOnEscape = true,
+	preferredIndex = 5,
 }
---斜杠线命令
-SLASH_SHMACROO1 = "/sh" 
-SLASH_SHMACROO2 = "/SH" 
-SlashCmdList["SHMACROO"] = function() 
-	StaticPopup_Show("SH_MACROO") 
+-- Slash commands
+SLASH_SCMACRO1 = "/sc"
+SLASH_SCMACRO2 = "/SC"
+SlashCmdList["SCMACRO"] = function()
+	StaticPopup_Show("SC_MACRO")
+end
+
+-- Delete macros only dialog
+StaticPopupDialogs.SH_MACROO = {
+	text = "Are you sure you want to delete all macros?",
+	button1 = ACCEPT,
+	button2 = CANCEL,
+	-- Function calls
+	OnAccept = function() UIcfg() end,
+	timeout = 0,
+	whileDead = 1,
+	hideOnEscape = true,
+	preferredIndex = 5,
+}
+-- Slash commands
+SLASH_SHMACROO1 = "/sh"
+SLASH_SHMACROO2 = "/SH"
+SlashCmdList["SHMACROO"] = function()
+	StaticPopup_Show("SH_MACROO")
 end

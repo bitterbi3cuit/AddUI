@@ -1,9 +1,9 @@
 local _, ns = ...
-local BP,BPT = false, false
+local BP, BPT = false, false
 local oldfunction = ItemUtil.GetCraftingReagentCount
 ns.event("ADDON_LOADED", function(event, addon)
     if ProfessionsFrame then
-        BP,BPT = true, true
+        BP, BPT = true, true
     end
     if addon == "Blizzard_Professions" then BP = true end
     if addon == "Blizzard_ProfessionsTemplates" then BPT = true end
@@ -12,14 +12,14 @@ ns.event("ADDON_LOADED", function(event, addon)
     ProfessionsFrame.UnlockAll = CreateFrame("CheckButton", "UnlockAllReagentsButton", ProfessionsFrame.CraftingPage.SchematicForm, "UICheckButtonTemplate")
     ProfessionsFrame.UnlockAll:SetSize(26,26)
     ProfessionsFrame.UnlockAll:SetPoint("BOTTOMLEFT", 30, 0)
-    ProfessionsFrame.UnlockAll.text:SetText(LIGHTGRAY_FONT_COLOR:WrapTextInColorCode("解锁所有材料以方便查看星级"))
+    ProfessionsFrame.UnlockAll.text:SetText(LIGHTGRAY_FONT_COLOR:WrapTextInColorCode("Unlock all reagents to view star ratings"))
     ProfessionsFrame.UnlockAll:SetScript("OnClick", function(self)
         if self:GetChecked() then
             ItemUtil.GetCraftingReagentCount = function() return 999 end
         else
             ItemUtil.GetCraftingReagentCount = oldfunction
         end
-        --事件刷新抄的EnhancedCrafting
+        -- Event refresh copied from EnhancedCrafting
         if ProfessionsFrame and ProfessionsFrame.OrdersPage and ProfessionsFrame.OrdersPage.OrderView and ProfessionsFrame.OrdersPage.OrderView.OrderDetails then
             local f = ProfessionsFrame.OrdersPage.OrderView.OrderDetails.SchematicForm
             if f and f.UpdateAllSlots then f:UpdateAllSlots() end
