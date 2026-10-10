@@ -1,5 +1,5 @@
 ﻿local _,ns = ...
-ns.tips("让Details昵称可以改中文")
+ns.tips("Allow the Details nickname to be changed to Chinese")
 ns.event("PLAYER_ENTERING_WORLD", function()
 --details昵称扩展器https://wago.io/uq0Uox6Ta/3
 --details改昵称新版https://wago.io/gyf9vnUCZ

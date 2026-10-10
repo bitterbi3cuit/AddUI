@@ -1,6 +1,6 @@
 local _,ns = ...
 if 1 == 1 then return end
-ns.tips("系统设置(Esc选项) 账号共享设置")
+ns.tips("System Settings (Esc Options) — Account-Shared Settings")
 
 -- ================= 系统设置(Esc→选项)CVar 清单 =================
 -- 来源：暴雪 wow-ui-source（live/12.x）Blizzard_SettingsDefinitions_Shared / _Frame 各面板注册代码
