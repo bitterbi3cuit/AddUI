@@ -1,10 +1,10 @@
-﻿local _,ns = ...
+local _,ns = ...
 ns.event("PLAYER_LOGIN", function()
 if not AddUIDB.chatm then return end
 
---部分修改自NGA链接http://bbs.ngacn.cc/read.php?tid=9706946
+-- Partly modified from an NGA thread: http://bbs.ngacn.cc/read.php?tid=9706946
 
--- 配置聊天框分页------------------------------------
+-- Configure chat frame tabs ------------------------------------
 
 local function GetChatFrame(cname)
 	local index = 0
@@ -30,54 +30,54 @@ local function ChatAddWindow(name)
 		ChatFrame_AddMessageGroup(chatFrame, "WHISPER")
 	end
 	if name == "聊天" then
-		ChatFrame_AddMessageGroup(chatFrame, "SAY")--说
-		ChatFrame_AddMessageGroup(chatFrame, "YELL")--喊
-		ChatFrame_AddMessageGroup(chatFrame, "EMOTE")--表情
-		ChatFrame_AddMessageGroup(chatFrame, "GUILD")--公会
-		ChatFrame_AddMessageGroup(chatFrame, "OFFICER")--官员
-		ChatFrame_AddMessageGroup(chatFrame, "GUILD_ACHIEVEMENT")--公会通告
-		ChatFrame_AddMessageGroup(chatFrame, "ACHIEVEMENT")--成就通告
-		ChatFrame_AddMessageGroup(chatFrame, "WHISPER")--密语
-		ChatFrame_AddMessageGroup(chatFrame, "BN_WHISPER")--战网密语
-		ChatFrame_AddMessageGroup(chatFrame, "PARTY")--小队
-		ChatFrame_AddMessageGroup(chatFrame, "PARTY_LEADER")--队长
-		ChatFrame_AddMessageGroup(chatFrame, "RAID")--团队
-		ChatFrame_AddMessageGroup(chatFrame, "RAID_LEADER")--团队领袖
-		ChatFrame_AddMessageGroup(chatFrame, "RAID_WARNING")--团队警报
-		ChatFrame_AddMessageGroup(chatFrame, "INSTANCE_CHAT")--副本队伍
-		ChatFrame_AddMessageGroup(chatFrame, "INSTANCE_CHAT_LEADER")--副本领袖
+		ChatFrame_AddMessageGroup(chatFrame, "SAY")-- Say
+		ChatFrame_AddMessageGroup(chatFrame, "YELL")-- Yell
+		ChatFrame_AddMessageGroup(chatFrame, "EMOTE")-- Emote
+		ChatFrame_AddMessageGroup(chatFrame, "GUILD")-- Guild
+		ChatFrame_AddMessageGroup(chatFrame, "OFFICER")-- Officer
+		ChatFrame_AddMessageGroup(chatFrame, "GUILD_ACHIEVEMENT")-- Guild announcement
+		ChatFrame_AddMessageGroup(chatFrame, "ACHIEVEMENT")-- Achievement announcement
+		ChatFrame_AddMessageGroup(chatFrame, "WHISPER")-- Whisper
+		ChatFrame_AddMessageGroup(chatFrame, "BN_WHISPER")-- Battle.net whisper
+		ChatFrame_AddMessageGroup(chatFrame, "PARTY")-- Party
+		ChatFrame_AddMessageGroup(chatFrame, "PARTY_LEADER")-- Party leader
+		ChatFrame_AddMessageGroup(chatFrame, "RAID")-- Raid
+		ChatFrame_AddMessageGroup(chatFrame, "RAID_LEADER")-- Raid leader
+		ChatFrame_AddMessageGroup(chatFrame, "RAID_WARNING")-- Raid warning
+		ChatFrame_AddMessageGroup(chatFrame, "INSTANCE_CHAT")-- Instance chat
+		ChatFrame_AddMessageGroup(chatFrame, "INSTANCE_CHAT_LEADER")-- Instance leader
 
-		--ChatFrame_AddMessageGroup(chatFrame, "COMBAT_XP_GAIN")--经验
-		--ChatFrame_AddMessageGroup(chatFrame, "COMBAT_GUILD_XP_GAIN")--公会经验
-		ChatFrame_AddMessageGroup(chatFrame, "COMBAT_HONOR_GAIN")--荣誉
-		ChatFrame_AddMessageGroup(chatFrame, "COMBAT_FACTION_CHANGE")--声望
-		ChatFrame_AddMessageGroup(chatFrame, "SKILL")--技能提升
-		ChatFrame_AddMessageGroup(chatFrame, "LOOT")--物品拾取
-		ChatFrame_AddMessageGroup(chatFrame, "CURRENCY")--货币
-		ChatFrame_AddMessageGroup(chatFrame, "MONEY")--金钱拾取
-		--ChatFrame_AddMessageGroup(chatFrame, "TRADESKILLS")--商业技能
-		ChatFrame_AddMessageGroup(chatFrame, "OPENING")--正在打开
-		ChatFrame_AddMessageGroup(chatFrame, "PET_INFO")--宠物信息
-		ChatFrame_AddMessageGroup(chatFrame, "COMBAT_MISC_INFO")--其他信息
+		--ChatFrame_AddMessageGroup(chatFrame, "COMBAT_XP_GAIN")-- Experience
+		--ChatFrame_AddMessageGroup(chatFrame, "COMBAT_GUILD_XP_GAIN")-- Guild experience
+		ChatFrame_AddMessageGroup(chatFrame, "COMBAT_HONOR_GAIN")-- Honor
+		ChatFrame_AddMessageGroup(chatFrame, "COMBAT_FACTION_CHANGE")-- Reputation
+		ChatFrame_AddMessageGroup(chatFrame, "SKILL")-- Skill up
+		ChatFrame_AddMessageGroup(chatFrame, "LOOT")-- Item loot
+		ChatFrame_AddMessageGroup(chatFrame, "CURRENCY")-- Currency
+		ChatFrame_AddMessageGroup(chatFrame, "MONEY")-- Money loot
+		--ChatFrame_AddMessageGroup(chatFrame, "TRADESKILLS")-- Tradeskills
+		ChatFrame_AddMessageGroup(chatFrame, "OPENING")-- Opening
+		ChatFrame_AddMessageGroup(chatFrame, "PET_INFO")-- Pet info
+		ChatFrame_AddMessageGroup(chatFrame, "COMBAT_MISC_INFO")-- Misc info
 
-		ChatFrame_AddMessageGroup(chatFrame, "BG_HORDE")--战场部落
-		ChatFrame_AddMessageGroup(chatFrame, "BG_ALLIANCE")--战场联盟
-		ChatFrame_AddMessageGroup(chatFrame, "BG_NEUTRAL")--战场中立
+		ChatFrame_AddMessageGroup(chatFrame, "BG_HORDE")-- Battleground Horde
+		ChatFrame_AddMessageGroup(chatFrame, "BG_ALLIANCE")-- Battleground Alliance
+		ChatFrame_AddMessageGroup(chatFrame, "BG_NEUTRAL")-- Battleground Neutral
 
-		ChatFrame_AddMessageGroup(chatFrame, "SYSTEM")--系统
-		ChatFrame_AddMessageGroup(chatFrame, "ERRORS")--错误
-		ChatFrame_AddMessageGroup(chatFrame, "IGNORED")--已屏蔽
-		ChatFrame_AddMessageGroup(chatFrame, "TARGETICONS")--目标图标
-		ChatFrame_AddMessageGroup(chatFrame, "BN_INLINE_TOAST_ALERT")--战网提示
-		--ChatFrame_AddMessageGroup(chatFrame, "PET_BATTLE_COMBAT_LOG")--宠物对战
-		--ChatFrame_AddMessageGroup(chatFrame, "PET_BATTLE_INFO")--宠物对战信息
+		ChatFrame_AddMessageGroup(chatFrame, "SYSTEM")-- System
+		ChatFrame_AddMessageGroup(chatFrame, "ERRORS")-- Errors
+		ChatFrame_AddMessageGroup(chatFrame, "IGNORED")-- Ignored
+		ChatFrame_AddMessageGroup(chatFrame, "TARGETICONS")-- Target icons
+		ChatFrame_AddMessageGroup(chatFrame, "BN_INLINE_TOAST_ALERT")-- Battle.net toast
+		--ChatFrame_AddMessageGroup(chatFrame, "PET_BATTLE_COMBAT_LOG")-- Pet battle
+		--ChatFrame_AddMessageGroup(chatFrame, "PET_BATTLE_INFO")-- Pet battle info
 
-		ChatFrame_AddMessageGroup(chatFrame, "MONSTER_SAY")--怪物说
-		ChatFrame_AddMessageGroup(chatFrame, "MONSTER_EMOTE")--怪物表情
-		ChatFrame_AddMessageGroup(chatFrame, "MONSTER_YELL")--怪物喊
-		ChatFrame_AddMessageGroup(chatFrame, "MONSTER_WHISPER")--怪物密语
-		ChatFrame_AddMessageGroup(chatFrame, "MONSTER_BOSS_EMOTE")--首领台词
-		ChatFrame_AddMessageGroup(chatFrame, "MONSTER_BOSS_WHISPER")--首领密语
+		ChatFrame_AddMessageGroup(chatFrame, "MONSTER_SAY")-- Monster say
+		ChatFrame_AddMessageGroup(chatFrame, "MONSTER_EMOTE")-- Monster emote
+		ChatFrame_AddMessageGroup(chatFrame, "MONSTER_YELL")-- Monster yell
+		ChatFrame_AddMessageGroup(chatFrame, "MONSTER_WHISPER")-- Monster whisper
+		ChatFrame_AddMessageGroup(chatFrame, "MONSTER_BOSS_EMOTE")-- Boss lines
+		ChatFrame_AddMessageGroup(chatFrame, "MONSTER_BOSS_WHISPER")-- Boss whisper
 
 	end
 	if name == "密语" then
@@ -105,7 +105,7 @@ local function Chat()
 
 	--DEFAULT_CHAT_FRAME:SetPoint("BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 0, 50);
 	--DEFAULT_CHAT_FRAME:SetSize(400, 200)
-	--聊天信息职业着色
+	-- Class-colored chat messages
 	for k,v in pairs(CHAT_CONFIG_CHAT_LEFT) do
 		SetChatColorNameByClass(v.type, true)
 	end
@@ -115,16 +115,14 @@ local function Chat()
 			SetChatColorNameByClass("CHANNEL"..id, true)
 		end
 	end
-	SetCVar("remoteTextToSpeech",0)	--在语音聊天中为我发言
+	SetCVar("remoteTextToSpeech",0)	-- Speak for me in voice chat
 end
-
-SLASH_CHAT1 = "/chat"		--输入命令执行
+SLASH_CHAT1 = "/chat"		-- Type the command to run it
 SlashCmdList["CHAT"] = function (msg, editbox)
 	if msg == "" then Chat()end
 end
 
-
---聊天框指向显示装备详情
+-- Show item/equipment details when hovering over the chat frame
 ---------------------------------------------------------------------------------------- 
 --   Based on tekKompare(by Tekkub) 
 ---------------------------------------------------------------------------------------- 
@@ -168,7 +166,7 @@ for i = 1, NUM_CHAT_WINDOWS do
 	frame:HookScript("OnHyperlinkLeave", OnHyperlinkLeave)
 end
 
--- 标签染色 ------------------------------------------------------------------------------------------------
+-- Tab coloring ------------------------------------------------------------------------------------------------
 local Fane = CreateFrame("Frame")
 local inherit = GameFontNormalSmall
 local color = RAID_CLASS_COLORS[select(2, UnitClass("player"))]
@@ -187,16 +185,16 @@ local function updateFS(self, inc, flags, ...)
 end
 
 local function OnEnter(self)
-	updateFS(self, nil, "OUTLINE", color.r, color.g, color.b)  -- 鼠标指向颜色
+	updateFS(self, nil, "OUTLINE", color.r, color.g, color.b)  -- Mouseover color
 end
 
 local function OnLeave(self)
 	local id = self:GetID()
 	local emphasis = _G["ChatFrame" .. id .. "TabFlash"]:IsShown()
 	if _G["ChatFrame" .. id] == SELECTED_CHAT_FRAME then
-		updateFS(self, false, nil, color.r, color.g, color.b)  -- 选中为职业色
+		updateFS(self, false, nil, color.r, color.g, color.b)  -- Selected = class color
 	else
-		updateFS(self, emphasis, nil, 1, 1, 1)                  -- emphasis 控制加粗
+		updateFS(self, emphasis, nil, 1, 1, 1)                  -- emphasis controls bold
 	end
 end
 
