@@ -1,147 +1,147 @@
--- Setting.lua：AddUI 新设置界面的标签与设置项（已在 toc 中加载）
--- 本文件只负责：左侧标签项 + 各标签对应的右侧设置项
--- 页面创建 / 左右布局 / 行构建工具 均来自 Setting-Core.lua
--- 用法：ns.AddTab("标签名", function()
---     ns.AddSection("分类标题")
---     ns.AddCheck("名称", "提示", "DB字段"[, 回调(勾选状态)])
---     ns.AddSlider("名称", "提示", min, max, step, "%.0f", "DB字段")
---     ns.AddDropdown("名称", "提示", {{"选项",值},...}, "DB字段"[, 回调(值)])
---     ns.AddTexture("名称", "提示", "DB字段", 纹理表[, 回调(值)])
---     ns.AddCVarCheck("名称", "提示", "CVar名"[, 位索引, 回调])
---     ns.AddCVarSlider("名称", "提示", min, max, step, "%.0f", "CVar名"[, 回调])
---     ns.AddDep("master的DB字段", {"从属DB字段1", "从属DB字段2", ...})
+-- Setting.lua: Tab and setting entries for the new AddUI settings interface (already loaded in the toc)
+-- This file only handles: left-side tabs + the right-side settings for each tab
+-- Page creation / left-right layout / row-building helpers all come from Setting-Core.lua
+-- Usage: ns.AddTab("TabName", function()
+--     ns.AddSection("Section title")
+--     ns.AddCheck("Name", "Tooltip", "DBField"[, callback(checked)])
+--     ns.AddSlider("Name", "Tooltip", min, max, step, "%.0f", "DBField")
+--     ns.AddDropdown("Name", "Tooltip", {{"Option",value},...}, "DBField"[, callback(value)])
+--     ns.AddTexture("Name", "Tooltip", "DBField", textureTable[, callback(value)])
+--     ns.AddCVarCheck("Name", "Tooltip", "CVarName"[, bitIndex, callback])
+--     ns.AddCVarSlider("Name", "Tooltip", min, max, step, "%.0f", "CVarName"[, callback])
+--     ns.AddDep("master DB field", {"dependent DB field 1", "dependent DB field 2", ...})
 -- end)
 local addonName, ns = ...
 
--- 打开设置界面的 slash 命令（Setting-Core 会动态注册）
+-- Slash commands to open the settings interface (registered dynamically by Setting-Core)
 ns.opensetting1 = "/ad"
 ns.opensetting2 = "/addui"
 
--- 顶部标题副标题与底部联系信息（AddUI 特有内容，注入给通用模块 Setting-Core）
-ns.Subtitle = "|cff00ffd2源生界面增强|r"
+-- Top title subtitle and bottom contact info (AddUI-specific content, injected into the generic Setting-Core module)
+ns.Subtitle = "|cff00ffd2Native UI Enhancement|r"
 
--- 底部联系方式文本（核心已不内置，AddUI 直接用 ns.SettingsFrame 创建，锚定底部左侧）
+-- Bottom contact text (no longer built into the core; AddUI creates it directly with ns.SettingsFrame, anchored bottom-left)
 local qqun = ns.SettingsFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
 qqun:SetPoint("BOTTOMLEFT", ns.SettingsFrame, "BOTTOMLEFT", 0, -28)
 qqun:SetJustifyH("LEFT")
-qqun:SetText("简繁:|cff00FFFF32655163@qq.com|r       修改设置后重载生效")
+qqun:SetText("CN/TW:|cff00FFFF32655163@qq.com|r       Reload required after changing settings")
 
 
--- ═══════ 界面 ═══════
-ns.AddTab("界面", function()
-	ns.AddSection("界面模块")
-	ns.AddCheck("头像模块", "改变头像样式", "unitf")
-	ns.AddCheck("动作条模块", "改变动作条样式", "mmb")
-	ns.AddCheck("禁用动作条额外动画", "禁用动作条的施法进度+指向技能圆圈+被断变红", "mmba")
-	ns.AddCheck("角色面板耐久", "C键面板装备栏下面的耐久度百分比", "syd")
-	ns.AddCheck("小地图模块", "方形小地图", "smap")
-	ns.AddCheck("小地图图标", "自动排列小地图图标,指向显示+离开时渐隐", "smapicon")
-	ns.AddCheck("聊天窗模块", "聊天窗口样式,tab可以切换聊天频道", "chatm")
-	ns.AddCheck("聊天频道按钮", "提供一行可以切换频道的按钮", "chatb")
-	ns.AddCheck("Log快捷开关", "聊天按钮后面的log按钮", "lotbnt")
+-- ═══════ Interface ═══════
+ns.AddTab("Interface", function()
+	ns.AddSection("Interface Modules")
+	ns.AddCheck("Portrait Module", "Changes the portrait style", "unitf")
+	ns.AddCheck("Action Bar Module", "Changes the action bar style", "mmb")
+	ns.AddCheck("Disable Extra Action Bar Animation", "Disables the action bar's cast progress + mouseover skill rings + turning red when interrupted", "mmba")
+	ns.AddCheck("Character Panel Durability", "Durability percentage below the equipment slots in the C panel", "syd")
+	ns.AddCheck("Minimap Module", "Square minimap", "smap")
+	ns.AddCheck("Minimap Icons", "Automatically arranges minimap icons, shows them on hover + fades out when the cursor leaves", "smapicon")
+	ns.AddCheck("Chat Window Module", "Chat window style; tabs can switch chat channels", "chatm")
+	ns.AddCheck("Chat Channel Buttons", "Provides a row of buttons for switching channels", "chatb")
+	ns.AddCheck("Log Quick Toggle", "The log button behind the chat buttons", "lotbnt")
 	ns.AddDep("chatb", {"lotbnt" })
-	ns.AddCheck("好友列表搜索", "此功能会导致不能传送家宅好友", "Friend")
-	ns.AddCheck("自身属性框体", "编辑模式拖动位置", "stat")
-	ns.AddCheck("右下角信息栏", "右下角显示延迟耐久", "dimi")
+	ns.AddCheck("Friend List Search", "This feature prevents you from teleporting to housing friends", "Friend")
+	ns.AddCheck("Own Character Stats Frame", "Drag its position in edit mode", "stat")
+	ns.AddCheck("Bottom-Right Info Bar", "Shows latency and durability in the bottom right", "dimi")
 
 end)
 
--- ═══════ 战斗 ═══════
-ns.AddTab("战斗", function()
-	ns.AddSection("战斗模块")
-	ns.AddCheck("进入战斗提示", "屏幕中间进入脱离战斗提示", "comb")
+-- ═══════ Combat ═══════
+ns.AddTab("Combat", function()
+	ns.AddSection("Combat Modules")
+	ns.AddCheck("Entering Combat Alert", "Shows an entering/leaving combat alert in the middle of the screen", "comb")
 	
-	ns.AddCheck("LFG增强", "预创建双击申请,自动邀请,自动进组 如果你用集合石,此项自动失效", "lfgkg")
+	ns.AddCheck("LFG Enhancements", "Double-click to apply to premade groups, auto-invite, auto-join group. If you use Premade Group Finder, this option is automatically disabled", "lfgkg")
 	
-	ns.AddCheck("冷却管理器美化", "冷却管理器美化", "cdset")
-	ns.AddCheck("冷却管理器居中对齐", "冷却管理器居中对齐,饰品药水BUFF整合", "cdcenter")
-	ns.AddCheck("大秘境重置伤害统计", "大秘境开始时重置伤害统计", "MDRedamage")
-	ns.AddCheck("伤害统计样式美化", "伤害统计样式美化", "setdama")
-	ns.AddCheck("伤害统计自动对齐", "伤害统计自动对齐", "poidama")
-	ns.AddCheck("伤害统计数值简化", "伤害统计数值简化", "valueda")
+	ns.AddCheck("Cooldown Manager Skinning", "Cooldown manager skinning", "cdset")
+	ns.AddCheck("Cooldown Manager Center Alignment", "Centers the cooldown manager and merges trinkets, potions and buffs", "cdcenter")
+	ns.AddCheck("Reset Damage Meter in Mythic+", "Resets the damage meter when a Mythic+ run starts", "MDRedamage")
+	ns.AddCheck("Damage Meter Skinning", "Damage meter skinning", "setdama")
+	ns.AddCheck("Damage Meter Auto Alignment", "Auto alignment for the damage meter", "poidama")
+	ns.AddCheck("Damage Meter Value Shortening", "Shortens values in the damage meter", "valueda")
 end)
-ns.AddTab("团队框架", function()
-	ns.AddSection("团队框架")
-	ns.AddCheck("团队框架职责图标", "团队框架职责图标更换为自定义材质", "raidRoleIcon")
-	ns.AddCheck("团队框架鼠标指向边框", "鼠标指向团队/小队框体时显示边框", "raidMouseHighlight")
-	ns.AddCheck("团队框架吸收盾", "团队框架显示治疗吸奶盾和普通吸收盾", "raidabsorb")
-	ns.AddCheck("团队框架减伤监控", "团队框架中间减伤使用自建,可以自定义id(插件预设),可以同时显示多个\n若要关闭使用系统自带,需要开启ESC-界面-重要防御技能居中", "raidframeDefense")
+ns.AddTab("Raid Frames", function()
+	ns.AddSection("Raid Frames")
+	ns.AddCheck("Raid Frame Role Icons", "Replaces raid frame role icons with a custom texture", "raidRoleIcon")
+	ns.AddCheck("Raid Frame Mouseover Border", "Shows a border when hovering over raid/party frames", "raidMouseHighlight")
+	ns.AddCheck("Raid Frame Absorbs", "Shows healing absorbs and regular absorbs on raid frames", "raidabsorb")
+	ns.AddCheck("Raid Frame Defensive Tracker", "Uses a custom implementation for defensives in the middle of raid frames, with customizable IDs (preset by the addon), and can show several at once.\nTo turn this off and use the built-in one, you need to enable ESC - Interface - Important Defensive Abilities in the Center", "raidframeDefense")
 end)
 
--- ═══════ 职业 ═══════
-ns.AddTab("职业", function()
-	ns.AddSection("法师")
-	ns.AddCheck("奥术涌动倒数", "奥术涌动结束提前4秒声音提醒", "mageCountdown")
-	ns.AddCheck("取消操控按钮", "BUFF栏左侧取消操控时间的按钮", "cancelAuraBtn")
-	ns.AddSection("萨满")
-	ns.AddCheck("升腾倒数", "萨满升腾结束提前4秒声音提醒", "shamanCountdown")
-	ns.AddCheck("自然守护者冷却", "小队在队伍旁,团队在编辑模式调位置", "shamanGuardianCountdown")
-	ns.AddCheck("雷霆之爪冷却", "自然守护者左侧显示雷霆之爪图标与冷却", "shamanThunderClaw")
+-- ═══════ Classes ═══════
+ns.AddTab("Classes", function()
+	ns.AddSection("Mage")
+	ns.AddCheck("Arcane Surge Countdown", "Plays a sound alert 4 seconds before Arcane Surge ends", "mageCountdown")
+	ns.AddCheck("Cancel Manipulation Button", "Button to the left of the buff bar for canceling Manipulation", "cancelAuraBtn")
+	ns.AddSection("Shaman")
+	ns.AddCheck("Ascendance Countdown", "Plays a sound alert 4 seconds before Ascendance ends", "shamanCountdown")
+	ns.AddCheck("Nature's Guardian Cooldown", "Party: next to the party frames; Raid: adjust the position in edit mode", "shamanGuardianCountdown")
+	ns.AddCheck("Thunder Claw Cooldown", "Shows the Thunder Claw icon and cooldown to the left of Nature's Guardian", "shamanThunderClaw")
 	ns.AddDep("shamanGuardianCountdown", {"shamanThunderClaw"})
-	ns.AddCheck("动作条图标切换", "施放流电炽焰把熔岩爆裂的图标替换成净化烈焰", "shamanIconSwap")
+	ns.AddCheck("Action Bar Icon Swap", "Replaces the Lava Burst icon with Purifying Flame when casting Tempest", "shamanIconSwap")
 
-	ns.AddSection("盗贼")
+	ns.AddSection("Rogue")
 	local function rogueLive()
 		if ns.RogueDotGridRefresh then ns.RogueDotGridRefresh() end
 	end
-	ns.AddCheck("奇袭DOT网格", "监控附近敌方姓名板,锁喉+割裂双DOT齐全变红,编辑模式拖动位置\n仅奇袭天赋生效,总开关改动需/reload", "rogueDotGrid")
-	ns.AddCheck("只监控战斗中的怪", "只显示已上仇恨列表 或 正在战斗的怪(含消失后DOT还在的)", "rogueDotGridThreatOnly", rogueLive)
-	ns.AddCheck("最小剩余时间倒数", "格子里显示两个DOT中最早到期那个的剩余时间", "rogueDotGridTimer", rogueLive)
-	ns.AddSlider("格子大小", "网格方块边长", 8, 30, 1, "%d", "rogueDotGridCell", rogueLive)
+	ns.AddCheck("Assassination DOT Grid", "Tracks nearby enemy nameplates; turns red when both Garrote + Rupture DOTs are applied; drag the position in edit mode.\nOnly works for Assassination spec; the master toggle requires /reload", "rogueDotGrid")
+	ns.AddCheck("Track Threat List Only", "Only shows nameplates on the threat list (that have been pulled)", "rogueDotGridThreatOnly", rogueLive)
+	ns.AddCheck("Show Earliest Expiry Countdown", "Shows the remaining time of whichever of the two DOTs expires first in each cell", "rogueDotGridTimer", rogueLive)
+	ns.AddSlider("Cell Size", "Side length of the grid squares", 8, 30, 1, "%d", "rogueDotGridCell", rogueLive)
 	ns.AddDep("rogueDotGrid", {"rogueDotGridThreatOnly", "rogueDotGridTimer", "rogueDotGridCell"})
 end)
 
--- ═══════ 其他 ═══════
-ns.AddTab("其他", function()
-	ns.AddSection("其他功能")
-	ns.AddCheck("CVAR自动设置", "自动配置部分CVAR,大部分已移动至/sd命令", "cvar")
-	ns.AddCheck("自动卖灰", "自动卖垃圾", "mh")
-	ns.AddCheck("快速拾取", "增加拾取速度", "sq")
-	ns.AddCheck("密语自动邀请", "别人密你123或者.组.会自动邀请,支持战网密语", "zu")
-	ns.AddCheck("装备一键选择器", "一键需求/贪婪/放弃全部装备", "autoloot")
+-- ═══════ Other ═══════
+ns.AddTab("Other", function()
+	ns.AddSection("Other Features")
+	ns.AddCheck("Automatic CVAR Setup", "Automatically configures some CVARs; most have been moved to the /sd command", "cvar")
+	ns.AddCheck("Auto Sell Grey", "Automatically sells junk", "mh")
+	ns.AddCheck("Fast Loot", "Increases looting speed", "sq")
+	ns.AddCheck("Whisper Auto-Invite", "Automatically invites when someone whispers you 123 or .group., supports Battle.net whispers", "zu")
+	ns.AddCheck("One-Click Equipment Selector", "One-click Need/Greed/Pass for all equipment", "autoloot")
 	
-	ns.AddCheck("聊天框战斗战复计时器", "聊天框右上角战斗战复计时器,战复在编辑模式拖动", "chatCombatTimer")
-	ns.AddCheck("打断记录", "小队打断记录,只记录打断成功的人,持续20秒,编辑模式拖动位置", "interrupt")
-	ns.AddCheck("被骗断语音提醒", "按下打断技能后没打断到目标时播放提示音", "interruptAlert")
-	ns.AddCheck("角色面板移动速度", "C键角色面板右下显示移动速度,悬停显示奔跑/飞行/游泳速度", "movspeed")
-	ns.AddButton("自身BUFF列表", "打开自身BUFF监控法术列表\n冷却管理器标题栏或编辑模式下右键自身BUFF框体也可打开", function()
+	ns.AddCheck("Chat Frame Combat Res Timer", "Combat res timer in the top-right of the chat frame; drag the combat res in edit mode", "chatCombatTimer")
+	ns.AddCheck("Interrupt Log", "Party interrupt log; only records successful interrupts, lasts 20 seconds, drag the position in edit mode", "interrupt")
+	ns.AddCheck("Interrupted Falsely Sound Alert", "Plays an alert sound when you use an interrupt ability but don't interrupt the target", "interruptAlert")
+	ns.AddCheck("Character Panel Movement Speed", "Shows movement speed in the bottom right of the C character panel; hover to show run/fly/swim speed", "movspeed")
+	ns.AddButton("Own Buff List", "Opens the list of spells monitored for your own buffs.\nCan also be opened by right-clicking your own buff frame on the cooldown manager title bar or in edit mode", function()
 		ns.OpenSelfBuffAuraList()
 	end)
 
-	ns.AddSection("右键菜单")
-	ns.AddCheck("Warcraft Logs", "玩家右键菜单里显示 WCL 链接,关闭后不显示", "wcl")
-	ns.AddCheck("Raider.IO", "玩家右键菜单里显示 Raider.IO 链接,关闭后不显示", "rio")
+	ns.AddSection("Right-Click Menu")
+	ns.AddCheck("Warcraft Logs", "Shows a WCL link in the player right-click menu; hidden when disabled", "wcl")
+	ns.AddCheck("Raider.IO", "Shows a Raider.IO link in the player right-click menu; hidden when disabled", "rio")
 
 end)
 
--- ═══════ 施法条 ═══════
-ns.AddTab("施法条", function()
-	ns.AddSection("施法条")
-	ns.AddCheck("施法条模块", "改变施法条样式", "cast")
-	ns.AddCheck("自定义施法条材质", "需启用施法条模块", "SCastTexture")
-	ns.AddTexture("施法条材质", "施法条材质选择", "CastTexture", ns.CastBarTextrue)
-	ns.AddSlider("施法条宽度", "施法条宽度", 200, 400, 1, "%d", "castWidth")
-	ns.AddSlider("施法条高度", "施法条高度", 10, 40, 1, "%d", "castHeight")
-	ns.AddSlider("施法序列延迟", "施法序列延迟", 0, 400, 1, "%d", "SpellQ", function(v)
+-- ═══════ Cast Bar ═══════
+ns.AddTab("Cast Bar", function()
+	ns.AddSection("Cast Bar")
+	ns.AddCheck("Cast Bar Module", "Changes the cast bar style", "cast")
+	ns.AddCheck("Custom Cast Bar Texture", "Requires the cast bar module to be enabled", "SCastTexture")
+	ns.AddTexture("Cast Bar Texture", "Cast bar texture selection", "CastTexture", ns.CastBarTextrue)
+	ns.AddSlider("Cast Bar Width", "Cast bar width", 200, 400, 1, "%d", "castWidth")
+	ns.AddSlider("Cast Bar Height", "Cast bar height", 10, 40, 1, "%d", "castHeight")
+	ns.AddSlider("Spell Queue Delay", "Spell queue delay", 0, 400, 1, "%d", "SpellQ", function(v)
 		SetCVar("SpellQueueWindow", v)
 	end)
-	-- 施法条模块关闭时，以下从属项禁用
+	-- When the cast bar module is off, the following dependent options are disabled
 	ns.AddDep("cast", { "SCastTexture", "CastTexture", "castWidth", "castHeight", "SpellQ" })
 	ns.AddDep("SCastTexture", { "CastTexture" })
 end)
 
--- ═══════ 提示与数值 ═══════
-ns.AddTab("提示数值", function()
-	ns.AddSection("提示与数值")
-	local fopts = { { "鼠标提示:跟随", 1 }, { "鼠标提示:不跟随", 0 }, { "鼠标提示:非战斗跟随", 2 }, { "鼠标提示:禁用", 3 } }
-	ns.AddDropdown("鼠标提示跟随方式", "鼠标提示跟随方式", fopts, "ftip")
-	local vopts = { { "中文单位", 1 }, { "英文单位", 2 }, { "暴雪默认", 3 } }
-	ns.AddDropdown("数值单位", "数值单位", vopts, "value")
+-- ═══════ Tooltips and Values ═══════
+ns.AddTab("Tooltip Values", function()
+	ns.AddSection("Tooltips and Values")
+	local fopts = { { "Tooltip: Follow", 1 }, { "Tooltip: Don't Follow", 0 }, { "Tooltip: Follow Out of Combat", 2 }, { "Tooltip: Disabled", 3 } }
+	ns.AddDropdown("Tooltip Follow Mode", "Tooltip follow mode", fopts, "ftip")
+	local vopts = { { "Chinese Units", 1 }, { "English Units", 2 }, { "Blizzard Default", 3 } }
+	ns.AddDropdown("Value Units", "Value units", vopts, "value")
 end)
 
--- ═══════ 其他 ═══════
-ns.AddTab("小功能", function()
--- 没开关的功能列表（原 Options.lua 的"其他功能"提示）
+-- ═══════ Other ═══════
+ns.AddTab("Misc", function()
+-- List of features without toggles (the original "Other Features" notice from Options.lua)
 	if ns.TIPTEXTS and #ns.TIPTEXTS > 0 then
 		ns.AddLog(table.concat(ns.TIPTEXTS, "\n"))
 	end

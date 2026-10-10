@@ -33,7 +33,7 @@ local postCombatQueue = {}
 function ns.COMBAT(func, ...)--调用这个
 	if InCombatLockdown() then
         local args = {...}
-        print("正在战斗中,脱战后执行")
+        print("In combat — will execute after leaving combat")
         table.insert(postCombatQueue, function()
             func(unpack(args))
         end)
@@ -65,7 +65,7 @@ function ns.AddEdit(frame,name,center)
     -- 防重复：已创建过高亮层则不再重复初始化
     if frame.highlight then return end
     if not dbName or not EditModeManagerFrame then
-        print("编辑模式拖动位置功能缺少框体名或编辑模式框架")
+        print("Edit-mode drag feature is missing a frame name or edit-mode frame")
         return
     end
 
@@ -93,7 +93,7 @@ function ns.AddEdit(frame,name,center)
 
     frame.text = frame.highlight:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     frame.text:SetPoint("CENTER", 0, 0)
-    frame.text:SetFont("fonts\\ARHei.ttf", 30, "OUTLINE")
+    frame.text:SetFont("fonts\\ARIALN.ttf", 30, "OUTLINE")
     frame.text:SetText(name or "AddUI")
     frame.text:SetVertexColor(1,1,1,0.7)
 
@@ -178,7 +178,7 @@ end
 --提醒文本
 local adcfont = UIParent:CreateFontString("adcfont", "ARTWORK", "GameFontNormalLarge")
 adcfont:SetPoint("LEFT", QuickJoinToastButton, "RIGHT", 0, -1)
-adcfont:SetFont("fonts\\ARHei.ttf", 16, "OUTLINE")
+adcfont:SetFont("fonts\\ARIALN.ttf", 16, "OUTLINE")
 adcfont:SetVertexColor(0,1,1)
 local adcfontbg = UIParent:CreateTexture(nil, "BACKGROUND")
 adcfontbg:SetPoint("CENTER", adcfont, "CENTER", 0, 0)
@@ -373,5 +373,5 @@ function ns.tips(text)
 	table.insert(ns.TIPTEXTS, "|cffFFFFFF"..tipsindex..": "..text.."|r")
 	tipsindex = tipsindex + 1
 end
-ns.tips("|cff00FF00这里是一些没有开关的功能,如需开关联系我|r")
+ns.tips("|cff00FF00These features have no toggles — contact me if you need one|r")
 
