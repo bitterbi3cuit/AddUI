@@ -104,11 +104,11 @@ ns.event("PLAYER_LOGIN", function()
 
 	-- 编辑模式预览：显示几条假数据条，方便调整位置/大小
 	local previewData = {
-		{ name = "法师",     class = "MAGE",        value = 20, color = { r = 0.25, g = 0.78, b = 0.92 } },
-		{ name = "战士",     class = "WARRIOR",     value = 14, color = { r = 0.78, g = 0.61, b = 0.43 } },
-		{ name = "萨满祭司", class = "SHAMAN",      value = 12, color = { r = 0.00, g = 0.44, b = 0.87 } },
-		{ name = "死亡骑士", class = "DEATHKNIGHT", value = 12, color = { r = 0.77, g = 0.12, b = 0.23 } },
-		{ name = "圣骑士",   class = "PALADIN",     value = 15, color = { r = 0.96, g = 0.55, b = 0.73 } },
+		{ name = "MAGE",     class = "MAGE",        value = 20, color = { r = 0.25, g = 0.78, b = 0.92 } },
+		{ name = "WARRIOR",     class = "WARRIOR",     value = 14, color = { r = 0.78, g = 0.61, b = 0.43 } },
+		{ name = "SHAMAN", class = "SHAMAN",      value = 12, color = { r = 0.00, g = 0.44, b = 0.87 } },
+		{ name = "DEATHKNIGHT", class = "DEATHKNIGHT", value = 12, color = { r = 0.77, g = 0.12, b = 0.23 } },
+		{ name = "PALADIN",   class = "PALADIN",     value = 15, color = { r = 0.96, g = 0.55, b = 0.73 } },
 	}
 	local function ShowPreview()
 		for i, data in ipairs(previewData) do

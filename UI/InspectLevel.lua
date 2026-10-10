@@ -1,11 +1,11 @@
 ﻿local _,ns = ...
-ns.tips("观察界面显示装等")
+ns.tips("Show item level in inspect frame")
 ns.hook("ShowUIPanel", function(self)
 	if self ~= InspectFrame then return end
 	if not InspectPaperDollItemsFrame then return end
 	if not ADInspectLevel then 
 		local ADInspectLevel = InspectPaperDollItemsFrame:CreateFontString("ADInspectLevel", "ARTWORK")
-		ADInspectLevel:SetFont("fonts\\ARHei.ttf", 25, "OUTLINE") 
+		ADInspectLevel:SetFont("fonts\\ARIALN.ttf", 25, "OUTLINE") 
 		ADInspectLevel:SetPoint("RIGHT",InspectFrame.TopTileStreaks,"RIGHT",-3, 0)
 	end
 	if ADInspectLevel then

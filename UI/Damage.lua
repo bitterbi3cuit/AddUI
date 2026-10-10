@@ -6,7 +6,7 @@ ns.event("CHALLENGE_MODE_START", function()
 	local _, elapsed = GetWorldElapsedTime(1)
 	if elapsed and elapsed > 30 then return end
 	C_DamageMeter.ResetAllCombatSessions();
-	print("|cffb044a2ADDUI:|r " .."已重置伤害统计")
+	print("|cffb044a2ADDUI:|r " .."Damage statistics have been reset.")
 end)
 ns.event("PLAYER_ENTERING_WORLD", function()
 	if DamageMeter  then

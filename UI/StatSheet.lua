@@ -4,21 +4,21 @@ ns.event("PLAYER_LOGIN", function()
 	if not AddUIDB.stat then return end
 	
 	local StatSheet = CreateFrame("Frame", "StatSheet", UIParent)
-	StatSheet:SetSize(150, 115)
+	StatSheet:SetSize(160, 115)
 	StatSheet:SetPoint("BOTTOMRIGHT", MainActionBar, "BOTTOMLEFT", -3, -3)
 	ns.AddEdit(StatSheet)
 	
 	local Y = 0
-	local scale = 17
+	local scale = 15
 	local StatList = {}
 	local function CreateText(text1,text2,color)
 		local Text1 = StatSheet:CreateFontString("Text", "OVERLAY")
-		Text1:SetFont("fonts\\ARHei.ttf", scale, "OUTLINE")
+		Text1:SetFont("fonts\\ARIALN.ttf", scale, "OUTLINE")
 		Text1:SetText(text1..":")
 		Text1:SetPoint("TOPLEFT", 0, (-scale-2) * Y)
 		Text1:SetTextColor(unpack(color))
 		local Text2 = StatSheet:CreateFontString("Text", "OVERLAY")
-		Text2:SetFont("fonts\\ARHei.ttf", scale, "OUTLINE")
+		Text2:SetFont("fonts\\ARIALN.ttf", scale, "OUTLINE")
 		Text2:SetText(text2)
 		Text2:SetPoint("TOPRIGHT", 0, (-scale-2) * Y)
 		Text2:SetTextColor(unpack(color))
@@ -28,19 +28,19 @@ ns.event("PLAYER_LOGIN", function()
 	
 	if statTimer then return end
 	statTimer = C_Timer.NewTicker(0.3, function()
-		if StatList["主属性"] then
+		if StatList["Primary Stat"] then
 			local _, _, _, _, _, primaryStat = GetSpecializationInfo(GetSpecialization())
 			primaryStat = primaryStat or 1
 			local strength = UnitStat("player", primaryStat)
-			StatList["主属性"]:SetText(format("%d", strength))
+			StatList["Primary Stat"]:SetText(format("%d", strength))
 		else
-			CreateText("主属性","主属性",{1, 0, 1})
+			CreateText("Primary Stat","Primary Stat",{1, 0, 1})
 		end
 		local _,itemlevel = GetAverageItemLevel()
-		if StatList["装等"] then
-			StatList["装等"]:SetText(format("%.1f", itemlevel))
+		if StatList["Item Level"] then
+			StatList["Item Level"]:SetText(format("%.1f", itemlevel))
 		else
-			CreateText("装等","装等",{0, 1, 1})
+			CreateText("Item Level","Item Level",{0, 1, 1})
 		end
 		
 		if StatList[STAT_CRITICAL_STRIKE] then

@@ -1,5 +1,5 @@
 local _,ns = ...
-ns.tips("大秘境分数界面鼠标提示优化")--https://ngabbs.com/read.php?tid=42357797
+ns.tips("Mythic+ Score UI Tooltip Enhancement")--https://ngabbs.com/read.php?tid=42357797
 
 local function HookDungeonIcons()
 	if not ChallengesFrame then
@@ -11,7 +11,7 @@ local function HookDungeonIcons()
 				local mapChallengeModeID = self.mapID
 				if not mapChallengeModeID then return end
 				
-				-- 副本完成时间记录为UTC，需手动调整为当地时间
+				-- Dungeon completion times are stored in UTC; adjust manually to local time
 				local offset = 8
 				
 				local dungeonName, _, timeLimit = C_ChallengeMode.GetMapUIInfo(mapChallengeModeID)
@@ -28,36 +28,36 @@ local function HookDungeonIcons()
 					
 					local scoreColor = C_ChallengeMode.GetSpecificDungeonOverallScoreRarityColor(intimeInfo.dungeonScore)
 					if scoreColor then
-						GameTooltip:AddLine("评分: |c" .. scoreColor:GenerateHexColor() .. intimeInfo.dungeonScore .. "|r")
+						GameTooltip:AddLine("Score: |c" .. scoreColor:GenerateHexColor() .. intimeInfo.dungeonScore .. "|r")
 					else
-						GameTooltip:AddLine("评分: " .. intimeInfo.dungeonScore)
+						GameTooltip:AddLine("Score: " .. intimeInfo.dungeonScore)
 					end
 					
 					GameTooltip:AddLine(" ")
-					GameTooltip:AddLine("最佳记录", 1, 0.75, 0)
-					GameTooltip:AddLine("等级 " .. intimeInfo.level, 1, 1, 1)
+					GameTooltip:AddLine("Best Run", 1, 0.75, 0)
+					GameTooltip:AddLine("Level " .. intimeInfo.level, 1, 1, 1)
 					
 					local completionTimeFormatted = string.format("%02d:%02d", math.floor(intimeInfo.durationSec / 60), intimeInfo.durationSec % 60)
 					local remainingTime = timeLimit - intimeInfo.durationSec
 					local remainingTimeFormatted
 					
 					if remainingTime >= 0 then
-						remainingTimeFormatted = string.format("还剩 %02d:%02d", math.floor(remainingTime / 60), remainingTime % 60)
+						remainingTimeFormatted = string.format("Remaining %02d:%02d", math.floor(remainingTime / 60), remainingTime % 60)
 					else
-						remainingTimeFormatted = string.format("超时 %02d:%02d", math.abs(math.floor(remainingTime / 60)), math.abs(remainingTime % 60))
+						remainingTimeFormatted = string.format("Overtime %02d:%02d", math.abs(math.floor(remainingTime / 60)), math.abs(remainingTime % 60))
 					end
 					
-					GameTooltip:AddLine("时间 " .. completionTimeFormatted .. " (" .. remainingTimeFormatted .. ")", 1, 1, 1)
+					GameTooltip:AddLine("Time " .. completionTimeFormatted .. " (" .. remainingTimeFormatted .. ")", 1, 1, 1)
 					GameTooltip:AddLine(" ")
 					
-					GameTooltip:AddLine("队伍成员", 1, 0.75, 0)
+					GameTooltip:AddLine("Team Members", 1, 0.75, 0)
 					if intimeInfo.members then
 						for _, member in ipairs(intimeInfo.members) do
 							if member then
-								local className = select(2,GetClassInfo(member.classID)) or "未知职业"
+								local className = select(2,GetClassInfo(member.classID)) or "Unknown Class"
 								local color = RAID_CLASS_COLORS[className] or {r = 255, g = 255, b = 255}
-								local memberName = member.name or "未知"
-								local specName = select(2,GetSpecializationInfoByID(member.specID)) or "未知专精"
+								local memberName = member.name or "Unknown"
+								local specName = select(2,GetSpecializationInfoByID(member.specID)) or "Unknown Spec"
 								GameTooltip:AddLine(memberName.."("..specName..")", color.r, color.g, color.b)
 							end
 						end
@@ -65,7 +65,7 @@ local function HookDungeonIcons()
 					
 					GameTooltip:AddLine(" ")
 					local totalTimeFormatted = string.format("%02d:%02d", math.floor(timeLimit / 60), timeLimit % 60)
-					GameTooltip:AddLine("副本时间: " .. totalTimeFormatted, 1, 1, 1)
+					GameTooltip:AddLine("Dungeon Timer: " .. totalTimeFormatted, 1, 1, 1)
 					
 					local completionDate = intimeInfo.completionDate
 					if completionDate then
@@ -80,12 +80,12 @@ local function HookDungeonIcons()
 							adjustedDay = adjustedDay + 1
 						end
 						
-						GameTooltip:AddLine(string.format("完成日期: %d/%02d/%02d %02d:%02d", adjustedYear, adjustedMonth, adjustedDay, adjustedHour, adjustedMinute), 1, 1, 1)
+						GameTooltip:AddLine(string.format("Completion Date: %d/%02d/%02d %02d:%02d", adjustedYear, adjustedMonth, adjustedDay, adjustedHour, adjustedMinute), 1, 1, 1)
 					else
-						GameTooltip:AddLine("日期: 无法获取", 1, 1, 1)
+						GameTooltip:AddLine("Date: Unavailable", 1, 1, 1)
 					end
 				else
-					GameTooltip:AddLine("本赛季尚未有记录", 1, 0.5, 0.5)
+					GameTooltip:AddLine("No records for this season", 1, 0.5, 0.5)
 				end
 				
 				GameTooltip:Show()

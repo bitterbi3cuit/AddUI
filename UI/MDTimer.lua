@@ -1,5 +1,5 @@
 ﻿local _,ns = ...
-ns.tips("大秘境BOSS击杀时间记录(重置ADDUI配置不会重置历史记录)")
+ns.tips("Mythic+ Boss Kill Time Records (Resetting the ADDUI configuration will not reset history records)")
 ns.event("ADDON_LOADED", function(event, addon)
 	if addon == "Blizzard_ChallengesUI" then
 		local keystoneframe = ChallengesKeystoneFrame

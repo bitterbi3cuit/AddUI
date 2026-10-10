@@ -1,5 +1,5 @@
 local _, ns = ...
-ns.tips("已学物品着绿色")
+ns.tips("Already-learned items are highlighted in green.")
 
 -- 已学缓存（避免重复扫描tooltip）
 local cache = {}

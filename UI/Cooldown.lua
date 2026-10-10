@@ -2,7 +2,7 @@
 --hooksecurefunc(DamageMeterEntryMixin, "Init", function(self)
 ns.event("PLAYER_LOGIN", function()
 	if AddUIDB.cdset then
-		ns.tips("快速打开冷却管理器/cc")
+		ns.tips("Quickly open the cooldown manager./cc")
 		SlashCmdList["OPENCOOL"] = function() 
 			ns.COMBAT(ShowUIPanel,CooldownViewerSettings)
 		end 
@@ -24,7 +24,7 @@ ns.event("PLAYER_LOGIN", function()
 			end)
 			AddUI_OpenCC:SetScript("OnEnter", function(self)
 				GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-				GameTooltip:SetText("点击打开|cff00ff00冷却管理器|r\n/cc打开|cff00ff00冷却管理器",1,1,1)
+				GameTooltip:SetText("Click to Open|cff00ff00Cooldown Manager|r\n/ccOpen|cff00ff00Cooldown Manager",1,1,1)
 				GameTooltip:Show()
 			end)
 			AddUI_OpenCC:SetScript("OnLeave", function()

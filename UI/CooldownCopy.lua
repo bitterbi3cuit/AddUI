@@ -10,63 +10,63 @@ ns.event("PLAYER_ENTERING_WORLD", function()
 		self.LayoutDropdown:SetWidth(150)
 	end)
 	-------------------------------
-	local CLM = CooldownViewerSettings:GetLayoutManager() --主界面布局管理器
+	local CLM = CooldownViewerSettings:GetLayoutManager() --main layout manager
 	-------------------------------
 	local function UseDate(string)
 		local ClassName = UnitClass("player")
-		if string.match(string,ClassName) then--标签名必须包含职业名
+		if string.match(string,ClassName) then--The layout name must contain the class name
 			local CreatOK,CreatRet = pcall(function() 
-				return CLM:CreateLayoutsFromSerializedData(AddUIDB.CooldownDate[string])--创建布局
+				return CLM:CreateLayoutsFromSerializedData(AddUIDB.CooldownDate[string])--Create the layout
 			end)
 			if CreatOK then
 				local strID = CreatRet and CreatRet[1]
-				local tag = CLM:GetLayout(strID)--获取布局对象
-				local CanRet = CLM:CanActivateLayout(tag) --检查布局是否可以应用
-				--local ClassAndSpecTag = CooldownManagerLayout_GetClassAndSpecTag(tag)--获取职业专精标签
-				--local loyoutName = CooldownViewerUtil.GetClassAndSpecTagText(ClassAndSpecTag)--获取职业专精标签文本
-				local UsedText = CanRet and "已应用" or "当前专精无法应用"
+				local tag = CLM:GetLayout(strID)--Get the layout object
+				local CanRet = CLM:CanActivateLayout(tag) --Check whether the layout can be applied
+				--local ClassAndSpecTag = CooldownManagerLayout_GetClassAndSpecTag(tag)--Get the class and specialization tag
+				--local loyoutName = CooldownViewerUtil.GetClassAndSpecTagText(ClassAndSpecTag)--Get the class and specialization tag文本
+				local UsedText = CanRet and "Applied" or "Cannot be applied to the current specialization"
 				CooldownManagerLayout_SetName(tag, string)
 				if CanRet then
 					securecall(function()
 						CooldownViewerSettings:SetActiveLayoutByID(strID)
 					end)
 				end
-				print("|cff00ff00已导入:  |cff00ffff"..UsedText.."|r "..string.."|r")
+				print("|cff00ff00Imported:  |cff00ffff"..UsedText.."|r "..string.."|r")
 			else
-				print("|cffff0000冷却管理器加载失败: |r"..CreatRet)
+				print("|cffff0000Failed to load Cooldown Manager: |r"..CreatRet)
 			end
 		else
-			print("|cffff0000加载失败,字符串不属于该职业: "..string.."|r")
+			print("|cffff0000Load failed: the string does not belong to this class: "..string.."|r")
 		end
 	end
 	-------------------------------
 	local function DeleteAll()
 		CLM:ResetToDefaults()
-		print("|cffff0000冷却管理器已重置到默认配置|r")
+		print("|cffff0000Cooldown Manager has been reset to the default configuration|r")
 	end
 	-------------------------------
 	local function AddDate()
 		local UsetdID = CLM:GetActiveLayoutID()
 		if not UsetdID then 
-			print("|cffff0000入门配置无法存储,请先切换到其他配置|r")
-			return  --排除入门布局
+			print("|cffff0000The starter layout cannot be saved. Switch to another layout first.|r")
+			return  --Exclude the starter layout
 		end
-		local StrOK,StrRet = pcall(function() --字符串编码
+		local StrOK,StrRet = pcall(function() --Serialize the layout
 			return CooldownViewerSettings:GetLayoutManager():GetSerializer():SerializeLayouts(UsetdID)
 		end)
 		if StrOK and StrRet then
-			local CalendarTime = C_DateAndTime.GetCurrentCalendarTime() --获取时间
+			local CalendarTime = C_DateAndTime.GetCurrentCalendarTime() --Get the current date
 			local nowTime = CalendarTime.year.."."..CalendarTime.month.."."..CalendarTime.monthDay--.."-"..CalendarTime.hour..":"..CalendarTime.minute
-			local _,SpecName = C_SpecializationInfo.GetSpecializationInfo(GetSpecialization()) --获取当前专精
-			local dateName = SpecName.. " " .. nowTime .." "..UnitClass("player").." " ..UnitName("player")  --组合成存储名字
+			local _,SpecName = C_SpecializationInfo.GetSpecializationInfo(GetSpecialization()) --Get the current specialization
+			local dateName = SpecName.. " " .. nowTime .." "..UnitClass("player").." " ..UnitName("player")  --Combine into a save name
 			if AddUIDB.CooldownDate[dateName] then
-				print("|cffff0000已存在|cff00ffff同名存档|r:  "..dateName.."|r")
+				print("|cffff0000Already exists|cff00ffffa saved layout with the same name|r:  "..dateName.."|r")
 			else
 				AddUIDB.CooldownDate[dateName] = StrRet
-				print("|cff00ff00已存储:  "..dateName.."|r")
+				print("|cff00ff00Saved:  "..dateName.."|r")
 			end
 		else
-			print("|cffff0000冷却管理器配置存储失败: 无法获取当前布局字符串|r"..StrRet)
+			print("|cffff0000Failed to save Cooldown Manager layout: could not get the current layout string|r"..StrRet)
 		end
 	end
 	-------------------------------
@@ -75,13 +75,13 @@ ns.event("PLAYER_ENTERING_WORLD", function()
 		CooldownViewerSettings.MyDateDropdown:SetPoint("BOTTOMRIGHT",CooldownViewerSettings.NineSlice.BottomEdge,"BOTTOMRIGHT" ,-60, 4)
 		CooldownViewerSettings.MyDateDropdown:SetWidth(80)
 		CooldownViewerSettings.MyDateDropdown.Text1 = CooldownViewerSettings.MyDateDropdown:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-		CooldownViewerSettings.MyDateDropdown.Text1:SetText("配置")
+		CooldownViewerSettings.MyDateDropdown.Text1:SetText("Layouts")
 		CooldownViewerSettings.MyDateDropdown.Text1:SetVertexColor(1,1,1,1)
 		CooldownViewerSettings.MyDateDropdown.Text1:SetPoint("CENTER", CooldownViewerSettings.MyDateDropdown, "CENTER", -8, 0)
 		CooldownViewerSettings.MyDateDropdown.Text1:Show()
 		local function IsSelected()
 		end
-		local function SetSelected(value)--返回选中的字符串
+		local function SetSelected(value)--Return the selected string
 			UseDate(value)
 		end
 		CooldownViewerSettings.MyDateDropdown:SetupMenu(function(dropdown, rootDescription)
@@ -99,9 +99,9 @@ ns.event("PLAYER_ENTERING_WORLD", function()
 					MenuTemplates.SetUtilityButtonTooltipText(deleteLayoutButton, COOLDOWN_VIEWER_SETTINGS_DELETE_LAYOUT);
 					MenuTemplates.SetUtilityButtonAnchor(deleteLayoutButton, MenuVariants.CancelButtonAnchor, true);
 					MenuTemplates.SetUtilityButtonClickHandler(deleteLayoutButton, function()
-						AddUIDB.CooldownDate[layoutID] = nil  -- 假设你是按键值删除
-						dropdown:GenerateMenu()	--刷新菜单
-						print("|cffff0000已删除: " .. layoutID)
+						AddUIDB.CooldownDate[layoutID] = nil  -- Delete by key
+						dropdown:GenerateMenu()	--Refresh the menu
+						print("|cffff0000Deleted: " .. layoutID)
 					end);
 				end);
 			end
@@ -115,7 +115,7 @@ ns.event("PLAYER_ENTERING_WORLD", function()
 		CooldownViewerSettings.SetDateButton:Show()
 		CooldownViewerSettings.SetDateButton.Text = CooldownViewerSettings.SetDateButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 		CooldownViewerSettings.SetDateButton.Text:SetPoint("CENTER", CooldownViewerSettings.SetDateButton, "CENTER", 0, 0)
-		CooldownViewerSettings.SetDateButton.Text:SetText("存储")
+		CooldownViewerSettings.SetDateButton.Text:SetText("Save")
 		CooldownViewerSettings.SetDateButton:SetScript("OnClick", function()
 			if IsShiftKeyDown() and IsControlKeyDown() and IsAltKeyDown() then
 				DeleteAll()
@@ -125,7 +125,7 @@ ns.event("PLAYER_ENTERING_WORLD", function()
 		end)
 		CooldownViewerSettings.SetDateButton:SetScript("OnEnter", function(self)
 			GameTooltip:SetOwner(self, "ANCHOR_TOP")
-			GameTooltip:SetText("|cff00ff00点击保存到右边本地配置|r\n|cffff0000按Ctrl+Shift+Alt+点击删除|cff00ffff左边|r全部布局|r",1,1,1)
+			GameTooltip:SetText("|cff00ff00Click to save to the local layouts on the right|r\n|cffff0000Ctrl+Shift+Alt-click to delete|cff00ffffleft|rall layouts|r",1,1,1)
 			GameTooltip:Show()
 		end)
 		CooldownViewerSettings.SetDateButton:SetScript("OnLeave", function()

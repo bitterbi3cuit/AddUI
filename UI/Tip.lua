@@ -72,9 +72,9 @@ end
 style(GameTooltip)
 
 --字体描边
-GameTooltipText:SetFont("Fonts\\ARKai_T.ttf",13, "OUTLINE")	--普通字体
-GameTooltipTextSmall:SetFont("Fonts\\ARKai_T.ttf", 13, "OUTLINE")	--装备比较字体
-GameTooltipHeaderText:SetFont("Fonts\\ARKai_T.ttf", 16, "OUTLINE")	--提示名字
+GameTooltipText:SetFont("Fonts\\ARIALN.ttf",13, "OUTLINE")	--普通字体
+GameTooltipTextSmall:SetFont("Fonts\\ARIALN.ttf", 13, "OUTLINE")	--装备比较字体
+GameTooltipHeaderText:SetFont("Fonts\\ARIALN.ttf", 16, "OUTLINE")	--提示名字
 --鼠标提示血条样式
 GameTooltipStatusBar:SetStatusBarTexture(130937)
 GameTooltipStatusBar:SetStatusBarColor(0,1,0,0.75)
@@ -142,12 +142,12 @@ local function TooltipBar(self, lineData)
 	local score = summary and summary.currentSeasonScore
 	if score and score > 0 then
 		local color = C_ChallengeMode.GetDungeonScoreRarityColor(score) or HIGHLIGHT_FONT_COLOR
-		GameTooltip:AddDoubleLine("史诗评分", score, 0, 0.7, 1, color.r, color.g, color.b)
+		GameTooltip:AddDoubleLine("Mythic+ Rating", score, 0, 0.7, 1, color.r, color.g, color.b)
 	end
 	local runs = summary and summary.runs
 	if runs and (IsAltKeyDown() or IsShiftKeyDown() or IsControlKeyDown()) then
 		GameTooltip:AddLine("     ")
-		GameTooltip:AddDoubleLine("副本", "评分层数", 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine("Dungeon", "Mythic+ Key Level", 1, 1, 1, 1, 1, 1)
 		for i, info in pairs(runs) do
 			local map = C_ChallengeMode.GetMapUIInfo(info.challengeModeID)
 			local colort = C_ChallengeMode.GetDungeonScoreRarityColor(info.mapScore*8) or HIGHLIGHT_FONT_COLOR
@@ -162,7 +162,7 @@ local function ShowID(self,data)
 	if self:IsForbidden() then return end
 	if InCombatLockdown() then return end
 	if self:IsTooltipType(Enum.TooltipDataType.Item) and not ns.MM(data.id) then
-			self:AddDoubleLine("|cffBA55D3物品ID:|r|cff00FF00"..data.id.."|r")
+			self:AddDoubleLine("|cffBA55D3ItemID:|r|cff00FF00"..data.id.."|r")
 	elseif self:IsTooltipType(Enum.TooltipDataType.Unit) and not ns.MM(data.guid) then
 		local npcid = tonumber(data.guid:match("-(%d+)-%x+$"), 10)
 		if npcid and data.guid:match("%a+") ~= "Player" then
@@ -176,7 +176,7 @@ local function ShowID(self,data)
 			SourceName = UnitName(aura.sourceUnit)
 			ClassColor = GetUnitColor(aura.sourceUnit)
 		end
-		self:AddDoubleLine("|cffBA55D3法术ID:|r|cff00FF00"..data.id.."|r",SourceName,1,1,1,ClassColor.r,ClassColor.g,ClassColor.b)
+		self:AddDoubleLine("|cffBA55D3Spell ID:|r|cff00FF00"..data.id.."|r",SourceName,1,1,1,ClassColor.r,ClassColor.g,ClassColor.b)
 	end
 end
 -- https://github.com/Stanzilla/WoWUIBugs/issues/298

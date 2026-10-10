@@ -1,6 +1,6 @@
 local addonName,ns = ...
 
--- 创建文本（原 ns.AddText，独立于此文件定义）
+-- Create text (originally ns.AddText, defined outside this file)
 local function AddText(frame,size)
 	local text = frame:CreateFontString(nil, "ARTWORK")
 	text:SetFont(STANDARD_TEXT_FONT, size, 'OUTLINE')
@@ -9,7 +9,7 @@ end
 
 ns.event("PLAYER_LOGIN", function()
 if not AddUIDB.dimi then return end
---金币
+-- Gold
 local gold = CreateFrame("Frame", nil, UIParent)
 gold:SetFrameLevel(50)
 gold:SetPoint("BOTTOMRIGHT",UIParent,-10,0)
@@ -17,41 +17,41 @@ local goldText = gold:CreateFontString(nil, "ARTWORK")
 goldText:SetFont(STANDARD_TEXT_FONT, 13, 'OUTLINE')
 goldText:SetPoint("RIGHT", gold, "RIGHT", 0, 0)
 
---耐久
+-- Durability
 local durable = AddText(UIParent,13)
 durable:SetPoint("BOTTOMRIGHT",UIParent,-120,0)
 
---帧数
+-- FPS
 local fps = AddText(UIParent,13)
 fps:SetPoint("BOTTOMRIGHT",UIParent,-240,0)
 
------------金币----------
+----------- Gold----------
 local GoldIcon = "\124TInterface\\MoneyFrame\\UI-GoldIcon:0:0:1:0\124t"
 local Profit	= 0
 local Spent		= 0
 local OldMoney	= 0
 
 local function formatMoney(money)
-	-- 只保留金币，银铜直接舍掉（不四舍五入）
+	-- Keep gold only; discard silver and copper (do not round)
 	return BreakUpLargeNumbers(floor(math.abs(money) / 10000))..GoldIcon
 end
 
 local function formatTextMoney(money)
-	-- 只保留金币，银铜直接舍掉（不四舍五入）
+	-- Keep gold only; discard silver and copper (do not round)
 	return floor(money / 10000).."|cffffd700"..GOLD_AMOUNT_SYMBOL
 end
 
------------金币记录（每个战网一个组，逐角色记录）----------
+----------- Gold tracking (one group per Battle.net account, recorded per character)----------
 -- 保存结构：AddUIDB.GoldTracker = {
---   ["战网ID"] = {
---     ["角色名-服务器"] = { n = 角色名, g = 铜币, c = 职业 },
---     warband = 战团银行铜币,
+--   ["Battle.net ID"] = {
+--     ["CharacterName-Realm"] = { n = character name, g = copper, c = class },
+--     warband = Warband Bank copper,
 --   },
 -- }
-local GOLD_MIN = 100 * 10000 -- 显示时过滤低于 100金 的角色
-local charsCache -- 悬停角色列表缓存，角色金币变化时失效
+local GOLD_MIN = 100 * 10000 -- Hide characters with less than 100 gold
+local charsCache -- Hovered character-list cache; invalidated when character gold changes
 
--- 角色名按职业配色
+-- Color character names by class
 local function ClassNameText(name, class)
 	local color = class and C_ClassColor.GetClassColor(class)
 	if color then return color:WrapTextInColorCode(name) end
@@ -64,12 +64,12 @@ local function GetGoldTrack()
 	return db
 end
 
--- 当前战网 ID（如 Name#1234），未连接时用 unknown 兜底
+-- Current Battle.net ID (e.g. Name#1234); use 'unknown' as a fallback when unavailable
 local function GetAccountTag()
 	return select(2, BNGetInfo()) or "unknown"
 end
 
--- 当前战网对应的角色组
+-- Character group for the current Battle.net account
 local function GetAccountGroup()
 	local db = GetGoldTrack()
 	local tag = GetAccountTag()
@@ -81,7 +81,7 @@ local function GetCharKey()
 	return format("%s-%s", UnitFullName("player"), GetNormalizedRealmName() or GetRealmName())
 end
 
--- 记录当前角色的金币
+-- Save the current character's gold
 local function SaveCharMoney()
 	local name, class = UnitName("player"), select(2, UnitClass("player"))
 	if not name then return end
@@ -89,7 +89,7 @@ local function SaveCharMoney()
 	charsCache = nil
 end
 
--- 战团银行金币：实时读取，读不到时用 DB 缓存值（存在当前战网组内）
+-- Warband Bank gold: read live; use the DB cache if unavailable (stored in the current Battle.net account group)
 local function GetWarbandMoney()
 	local group = GetAccountGroup()
 	local ok, money = pcall(C_Bank.FetchDepositedMoney, Enum.BankType.Account)
@@ -109,9 +109,9 @@ local function GetWarbandMoney()
 	return 0
 end
 
--- 当前战网下各角色的金币（当前角色固定排第一；其余过滤 < 100金，按金币从多到少）
--- 组内的 warband 是数字不是表，会被下面的 type 判断自然跳过
--- 结果缓存到 charsCache，仅角色金币变化后重建，避免每次悬停都遍历 + 排序
+-- Gold for characters on the current Battle.net account (current character always first; hide others below 100 gold, then sort by gold descending)
+-- The group's 'warband' entry is a number, not a table, so the type check below naturally skips it
+-- Cache results in charsCache; rebuild only when character gold changes to avoid iterating and sorting on every hover
 local function GetChars()
 	if charsCache then return charsCache end
 	local list = {}
@@ -135,7 +135,7 @@ ns.event("PLAYER_MONEY", SaveCharMoney)
 ns.event("PLAYER_ENTERING_WORLD", SaveCharMoney)
 ns.event("ACCOUNT_MONEY", function() GetWarbandMoney() end)
 
-local lastMoneyText -- 上次显示的金币文本，文本未变时跳过重排
+local lastMoneyText -- Previously displayed gold text; skip layout updates when unchanged
 local function OnMoneyEvent(event)
 	if event == "PLAYER_ENTERING_WORLD" then
 		OldMoney = GetMoney()
@@ -148,7 +148,7 @@ local function OnMoneyEvent(event)
 	else							-- Gained Moeny
 		Profit = Profit + Change
 	end
-	-- 金币文本没变就不重复测量宽度
+	-- Do not measure the width again if the gold text has not changed
 	local txt = formatTextMoney(NewMoney)
 	if txt ~= lastMoneyText then
 		lastMoneyText = txt
@@ -162,8 +162,8 @@ local function OnMoneyEvent(event)
 	OldMoney = NewMoney
 end
 
--- 鼠标提示脚本绑在 Frame 上（避免 FontString 鼠标事件不可靠），只需设置一次；
--- 提示内容实时读取 Profit / Spent 等上值，无需每次金币变化都重设脚本
+-- Attach the tooltip script to the Frame (FontString mouse events may be unreliable); set it only once;
+-- Tooltip content reads the current Profit / Spent values, so the script does not need to be reset whenever gold changes
 gold:SetScript("OnEnter", function()
 	GameTooltip:SetOwner(gold, "ANCHOR_TOP", 0, 6);
 	GameTooltip:ClearAllPoints()
@@ -171,13 +171,13 @@ gold:SetScript("OnEnter", function()
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(CURRENCY,0,.6,1)
 	GameTooltip:AddLine(" ")
-	GameTooltip:AddLine("本次登陆: ",.6,.8,1)
-	GameTooltip:AddDoubleLine("获得:", formatMoney(Profit), 1, 1, 1, 1, 1, 1)
-	GameTooltip:AddDoubleLine("花费:", formatMoney(Spent), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddLine("This session: ",.6,.8,1)
+	GameTooltip:AddDoubleLine("Earned:", formatMoney(Profit), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine("Spent:", formatMoney(Spent), 1, 1, 1, 1, 1, 1)
 	if Profit < Spent then
-		GameTooltip:AddDoubleLine("亏损:", formatMoney(Profit-Spent), 1, 0, 0, 1, 1, 1)
+		GameTooltip:AddDoubleLine("Loss:", formatMoney(Profit-Spent), 1, 0, 0, 1, 1, 1)
 	elseif (Profit-Spent)>0 then
-		GameTooltip:AddDoubleLine("盈利:", formatMoney(Profit-Spent), 0, 1, 0, 1, 1, 1)
+		GameTooltip:AddDoubleLine("Profit:", formatMoney(Profit-Spent), 0, 1, 0, 1, 1, 1)
 	end
 	local chars = GetChars()
 	local warband = GetWarbandMoney()
@@ -187,8 +187,8 @@ gold:SetScript("OnEnter", function()
 		GameTooltip:AddDoubleLine(ClassNameText(c.n, c.c), formatMoney(c.g), 1, 1, 1, 1, 1, 1)
 		total = total + c.g
 	end
-	GameTooltip:AddDoubleLine("战团银行:", formatMoney(warband), .6, .8, 1, 1, 1, 1)
-	GameTooltip:AddDoubleLine("总计:", formatMoney(total), 0, .8, 0, 0, 1, 0)
+	GameTooltip:AddDoubleLine("Warband Bank:", formatMoney(warband), .6, .8, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine("Total:", formatMoney(total), 0, .8, 0, 0, 1, 0)
 	GameTooltip:Show()
 end)
 gold:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -200,7 +200,7 @@ ns.event("PLAYER_TRADE_MONEY", OnMoneyEvent)
 ns.event("TRADE_MONEY_CHANGED", OnMoneyEvent)
 ns.event("PLAYER_ENTERING_WORLD", OnMoneyEvent)
 
------------耐久----------
+----------- Durability----------
 local gradient = function(perc)
 	perc = perc > 1 and 1 or perc < 0 and 0 or perc -- Stay between 0-1
 	local seg, relperc = math.modf(perc*2)
@@ -208,21 +208,21 @@ local gradient = function(perc)
 	local r,g,b = r1+(r2-r1)*relperc,g1+(g2-g1)*relperc,b1+(b2-b1)*relperc
 	return format("|cff%02x%02x%02x",r*255,g*255,b*255),r,g,b
 end
--- 耐久槽位（提升为外层变量，供事件处理与鼠标提示共用）
+-- Durability slots (promoted to an outer-scope variable shared by event handling and tooltips)
 local localSlots = {
-	[1] = {1, "头部", 1000},
-	[2] = {3, "肩部", 1000},
-	[3] = {5, "胸部", 1000},
-	[4] = {6, "腰部", 1000},
-	[5] = {9, "手腕", 1000},
-	[6] = {10, "手", 1000},
-	[7] = {7, "腿部", 1000},
-	[8] = {8, "脚", 1000},
-	[9] = {16, "主手", 1000},
-	[10] = {17, "副手", 1000},
-	[11] = {18, "远程", 1000}
+	[1] = {1, "Head", 1000},
+	[2] = {3, "Shoulders", 1000},
+	[3] = {5, "Chest", 1000},
+	[4] = {6, "Waist", 1000},
+	[5] = {9, "Wrists", 1000},
+	[6] = {10, "Hands", 1000},
+	[7] = {7, "Legs", 1000},
+	[8] = {8, "Feet", 1000},
+	[9] = {16, "Main Hand", 1000},
+	[10] = {17, "Off Hand", 1000},
+	[11] = {18, "Ranged", 1000}
 }
--- 鼠标提示（初始化时设置一次）
+-- Tooltip (set once during initialization)
 durable:SetScript("OnEnter", function()
 	local total, equipped = GetAverageItemLevel()
 	GameTooltip:SetOwner(durable, "ANCHOR_TOP", 0, 6);
@@ -258,7 +258,7 @@ local function OnDurabilityEvent(event)
 	table.sort(localSlots, function(a, b) return a[3] < b[3] end)
 	
 	if Total > 0 then
-		durable:SetText(format(gsub("[color]%d|r%%".."耐久","%[color%]",(gradient(floor(localSlots[1][3]*100)/100))), floor(localSlots[1][3]*100)))
+		durable:SetText(format(gsub("[color]%d|r%%".." Durability","%[color%]",(gradient(floor(localSlots[1][3]*100)/100))), floor(localSlots[1][3]*100)))
 	end
 end
 
@@ -266,7 +266,7 @@ ns.event("UPDATE_INVENTORY_DURABILITY", OnDurabilityEvent)
 ns.event("MERCHANT_SHOW", OnDurabilityEvent)
 ns.event("PLAYER_ENTERING_WORLD", OnDurabilityEvent)
 
------帧数
+----- FPS
 local function colorlatency(latency)
 	if latency < 300 then
 		return "|cff0CD809"..latency
@@ -291,7 +291,7 @@ C_Timer.NewTicker(1, function()
 	fps:SetText(fpscolor..floor(GetFramerate()).."|r".." Fps "..colorlatency(lat).."|r".."Ms")
 end)
 
---fps鼠标提示加上内存
+--Add memory usage to the FPS tooltip
 local function formatTotal(Total)
 	if Total >= 1024 then
 		return format("%.1fmb", Total / 1024)
@@ -313,7 +313,7 @@ local MemoryTabel = {}
 fps:SetScript("OnLeave", function() GameTooltip:Hide() end)
 fps:SetScript("OnEnter", function(self)
 	GameTooltip:SetOwner(fps, "ANCHOR_TOP", 0, 6);
-	GameTooltip:AddDoubleLine("总内存使用:",formatTotal(GetAllAddonsMemory()),.6,.8,1,1,1,1)
+	GameTooltip:AddDoubleLine("Total memory usage:",formatTotal(GetAllAddonsMemory()),.6,.8,1,1,1,1)
 	GameTooltip:AddLine(" ")
 	for i = 1, C_AddOns.GetNumAddOns() do
 		local Mem = GetAddOnMemoryUsage(i)
@@ -342,7 +342,7 @@ fps:SetScript("OnMouseDown", function(self, btn)
 	if btn == "LeftButton" then
 		local before = collectgarbage("count")
 		collectgarbage("collect")
-		print(format("|cff66C6FF%s:|r %s","释放內存",formatTotal(before - collectgarbage("count"))))
+		print(format("|cff66C6FF%s:|r %s","Freed memory",formatTotal(before - collectgarbage("count"))))
 		self:GetScript("OnEnter")(self)
 	end
 end)

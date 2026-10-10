@@ -2,14 +2,14 @@
 ns.event("PLAYER_ENTERING_WORLD", function()
 if AddUIDB.smap ==  false  then return end
 
---隐藏一些东西
-MinimapBackdrop:Hide()	--圆形材质
-MinimapCluster:SetScale(.8)	--大小
-Minimap:SetQuestBlobRingScalar(0)	--任务追踪环形网格
---微调小地图位置
+-- Hide some elements
+MinimapBackdrop:Hide()	-- circular texture
+MinimapCluster:SetScale(.8)	-- scale
+Minimap:SetQuestBlobRingScalar(0)	-- quest tracking ring mesh
+-- Fine-tune minimap position
 Minimap:SetPoint("CENTER",MinimapCluster,"TOP", 15,-125)
 
---边框材质
+-- Border texture
 Minimap:SetMaskTexture([=[Interface\ChatFrame\ChatFrameBackground]=])
 function GetMinimapShape() return "SQUARE" end
 
@@ -29,29 +29,29 @@ local function CreateShadow(f)
 end
 CreateShadow(Minimap)
 
---时钟
+-- Clock
 --LoadAddOn('Blizzard_TimeManager')
 local clockFrame, clockTime = TimeManagerClockButton:GetRegions()
 clockFrame:Show()
 clockTime:Hide()
 TimeManagerClockButton:ClearAllPoints()
 TimeManagerClockButton:SetPoint("CENTER",Minimap,"BOTTOM",0,-2)
-clockFrame:SetFont("fonts\\ARHei.ttf", 17, "OUTLINE")
+clockFrame:SetFont("fonts\\ARIALN.ttf", 17, "OUTLINE")
 
 
---插件按钮
+-- Addon compartment button
 AddonCompartmentFrame:ClearAllPoints()
 AddonCompartmentFrame:SetPoint("RIGHT",MinimapCluster.Tracking,"LEFT", -2,0)
 AddonCompartmentFrame:SetFrameStrata("MEDIUM")
---副本难度框
+-- Instance difficulty frame
 
---副本挑战模式难度框
+-- Instance challenge mode difficulty frame
 local mc = MinimapCluster.InstanceDifficulty
 mc:ClearAllPoints()
 mc:SetPoint("TOPLEFT", MinimapCluster, 0, -25)
 mc:SetScale(1)
 
---小地图要塞按钮位置和大小
+-- Minimap expansion landing page button position and size
 local function MinimapButtonE(self)
 self:SetParent(Minimap)
 self:ClearAllPoints()
@@ -63,15 +63,15 @@ ExpansionLandingPageMinimapButton:HookScript("OnShow", MinimapButtonE)
 ns.hook(ExpansionLandingPageMinimapButton, "UpdateIcon", MinimapButtonE)
 
 
---不显示位面ID的NPC
+-- NPCs that should not display a plane ID
 local NoID={
 --[]=true, --
-[181059]=true,  --波可波克：类型：Creature  NPCID：181059
-[25146]=true,   --佩奇：类型：Creature     NPCID：25146
-[62821]=true,   --秘法师鸟羽帽：类型：Creature     NPCID：62821
-[62822]=true,   --表弟慢热手：类型：Creature     NPCID：62822
-[142666]=true,  --收集者温塔：类型：Creature     NPCID：142666
-[142668]=true,  --商人马库：类型：Creature     NPCID：142668
+[181059]=true,  -- Pocopoc: Type: Creature  NPCID: 181059
+[25146]=true,   -- Pepe: Type: Creature     NPCID: 25146
+[62821]=true,   -- Arcanist Featherhat: Type: Creature     NPCID: 62821
+[62822]=true,   -- Cousin Slowhand: Type: Creature     NPCID: 62822
+[142666]=true,  -- Collector Winta: Type: Creature     NPCID: 142666
+[142668]=true,  -- Merchant Maku: Type: Creature     NPCID: 142668
 
 }
 local idframe = CreateFrame("Frame","mapid",UIParent)
@@ -79,7 +79,7 @@ idframe:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 idframe:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 idframe:SetFrameStrata("BACKGROUND")
 local weimian = idframe:CreateFontString(nil, "ARTWORK")
-weimian:SetFont("fonts\\ARHei.ttf", 11, "OUTLINE") 
+weimian:SetFont("fonts\\ARIALN.ttf", 11, "OUTLINE") 
 weimian:SetPoint("RIGHT",MinimapCluster.BorderTop,"RIGHT",0,1)
 idframe:SetScript("OnEvent", function(self,event,aaaa)
 if event == "UPDATE_MOUSEOVER_UNIT" then
@@ -91,26 +91,26 @@ if event == "UPDATE_MOUSEOVER_UNIT" then
 	if types == "Pet" then return end;
 	if zoneID == nil then return end;
     if NoID[ids] then return end;
-	weimian:SetText("位面:"..zoneID)	
+	weimian:SetText("Plane: "..zoneID)
 elseif event == "ZONE_CHANGED_NEW_AREA" then
 	weimian:SetText("")
 end
 		
 end)
 
---大地图输入坐标https://bbs.nga.cn/read.php?tid=24183736&_fp=3
--- 输入坐标标记位置
+-- World map coordinate input https://bbs.nga.cn/read.php?tid=24183736&_fp=3
+-- Input coordinates to mark a position
 local WayPointPositionButton = CreateFrame("Button", "WayPointPositionButton", WorldMapFrame.BorderFrame.TitleContainer, "UIPanelButtonTemplate")
 WayPointPositionButton:SetWidth(50)
 WayPointPositionButton:SetHeight(18)
 -- WayPointPositionButton.Font = WayPointPositionButton:CreateFontString(nil,nil)
 -- WayPointPositionButton.Font:SetFont("Fonts\\ZYKai_T.ttf",12)
 -- WayPointPositionButton:SetFontString(WayPointPositionButton.Font)
-WayPointPositionButton:SetText("定位")
+WayPointPositionButton:SetText("Locate")
 WayPointPositionButton:SetPoint("LEFT", WorldMapFrame.BorderFrame.Tutorial, "RIGHT", -20, 1)
 WayPointPositionButton:SetScript("OnShow", function() WayPointContainer:Close() end)
 
--- 设置目标位置
+-- Set the waypoint destination
 function WayPointPositionButton:SetWayPoint(desX, desY)
     local currentViewMapID = WorldMapFrame:GetMapID()
     if C_Map.CanSetUserWaypointOnMap(currentViewMapID) then
@@ -118,15 +118,15 @@ function WayPointPositionButton:SetWayPoint(desX, desY)
         C_Map.SetUserWaypoint(point)
         C_SuperTrack.SetSuperTrackedUserWaypoint(true);
     else
-        print("|cFFFF0000当前地图无法标记！|r")
+        print("|cFFFF0000Cannot mark on the current map!|r")
     end
 end
 
--- 点击定位按钮
+-- Locate button click handler
 function WayPointPositionButton.OnClick(button, down)
     local currentViewMapID = WorldMapFrame:GetMapID()
     if not C_Map.CanSetUserWaypointOnMap(currentViewMapID) then
-        print("|cFFFF0000当前地图无法标记！|r")
+        print("|cFFFF0000Cannot mark on the current map!|r")
         return
     end
     C_Map.ClearUserWaypoint()
@@ -163,7 +163,7 @@ function WayPointContainer:Close()
     WayPointContainer:Hide()
 end
 
--- 输入tab
+-- Tab key: cycle focus between coordinate fields
 local function OnCoordTabPressed(editBox)
     if editBox == WayPointContainer.CoordX then
         WayPointContainer.CoordX:ClearFocus()
@@ -174,7 +174,7 @@ local function OnCoordTabPressed(editBox)
     end
 end
 
--- 输入回车
+-- Enter key: confirm coordinate input
 local function OnCoordEnterPressed(editBox)
     if editBox == WayPointContainer.CoordX then
         if editBox:GetText():len() ~= 0 then

@@ -29,7 +29,7 @@ local function ADDUIUpdateHealthBar(s)
 		if not s.PCTargetPercent then
 			s.PCTargetPercent = s:CreateFontString(nil, "OVERLAY")
 			s.PCTargetPercent:SetVertexColor(1, 1, 1)
-			s.PCTargetPercent:SetFont("Fonts\\ARHei.ttf", 12, "OUTLINE")
+			s.PCTargetPercent:SetFont("Fonts\\ARIALN.ttf", 12, "OUTLINE")
 			s.PCTargetPercent:ClearAllPoints()
 			s.PCTargetPercent:SetPoint("CENTER", 0, 0)
 		end
@@ -39,7 +39,7 @@ local function ADDUIUpdateHealthBar(s)
 		if s.TextString and s.currValue then 
 			if statusTextDisplay == "NUMERIC" and not s.TextString2 and s.unit ~= "pet" then
 				s.TextString2 = s:CreateFontString(nil, "OVERLAY")
-				s.TextString2:SetFont("Fonts\\ARHei.ttf", 12, "OUTLINE")
+				s.TextString2:SetFont("Fonts\\ARIALN.ttf", 12, "OUTLINE")
 				s.TextString2:SetVertexColor(1, 1, 1)
 				if s.unit == "player" then
 					s.TextString2:SetPoint("RIGHT", s, "RIGHT", -2, 0)
@@ -163,7 +163,7 @@ ns.event("PLAYER_LOGIN", function()
 			local bossTargetFrame = _G["Boss"..i.."TargetFrame"];--Boss1TargetFrame
 			bossTargetFrame.TargetFrameContent.TargetFrameContentMain.Name:SetWidth(150)
 			--bossTargetFrame.TargetFrameContent.TargetFrameContentMain.Name:SetVertexColor(1, 1, 0)
-			bossTargetFrame.TargetFrameContent.TargetFrameContentMain.Name:SetFont("Fonts\\ARHei.ttf", 12, "")
+			bossTargetFrame.TargetFrameContent.TargetFrameContentMain.Name:SetFont("Fonts\\ARIALN.ttf", 12, "")
 			bossTargetFrame.TargetFrameContent.TargetFrameContentMain.Name:SetPoint("TOPLEFT",77,-32)
 			bossTargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBarsContainer.HealthBar.HealthBarTexture:SetTexture(hptexture1)
 			local color = ClassRGB(bossTargetFrame.unit)
@@ -329,7 +329,7 @@ ns.event("PLAYER_LOGIN", function()
 	--------------------------------------------------
 	PlayerFrame:UnregisterEvent("UNIT_COMBAT")
 	PetFrame:UnregisterEvent("UNIT_COMBAT")
-	PetName:SetFont("fonts\\ARHei.ttf", 12)
+	PetName:SetFont("fonts\\ARIALN.ttf", 12)
 
 
 end)

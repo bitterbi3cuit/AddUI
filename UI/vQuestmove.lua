@@ -1,5 +1,5 @@
 ﻿local _,ns = ...
-ns.tips("任务物品放左面")
+ns.tips("Move quest items to the left")
 local function moveQuestObjectiveItems(self)
 	local a = {self:GetPoint()}
 	self:ClearAllPoints()
@@ -11,23 +11,23 @@ ns.hook(QuestObjectiveItemButtonMixin,"OnUpdate", function(self, elapsed)
 	moveQuestObjectiveItems(self)
 end)
 
---通报
+-- Announce
 local function OnQuestEvent(event, ...)
 	if event == "PLAYER_ENTERING_WORLD" then
-		SetCVar("autoQuestWatch", 1)--屏幕中间的任务进度
-		SetCVar("showQuestTrackingTooltips", 1)--任务进度鼠标提示
+		SetCVar("autoQuestWatch", 1) -- quest progress display in the center of screen
+		SetCVar("showQuestTrackingTooltips", 1) -- quest progress mouse tooltip
 		if not ADDUIQuestCheck then 
 			local ADDUIQuestCheck = CreateFrame("CheckButton", "ADDUIQuestCheck", ObjectiveTrackerFrame.Header,"InterfaceOptionsCheckButtonTemplate")
 			ADDUIQuestCheck:SetPoint("LEFT", ObjectiveTrackerFrame.Header, "LEFT", 85, 0)
 			ADDUIQuestCheck:SetChecked(AddUIDB.QuestCheck)
-			ADDUIQuestCheck.text:SetText("通报")
+			ADDUIQuestCheck.text:SetText("Announce")
 			ADDUIQuestCheck:SetScale(0.9)
 			ADDUIQuestCheck:SetScript("OnClick", function (self)
 				AddUIDB.QuestCheck = self:GetChecked()
 			end)
 			ADDUIQuestCheck:SetScript("OnEnter",function(self) 
 				GameTooltip:SetOwner(self, "ANCHOR_TOP")
-				GameTooltip:AddLine("|cffFFFFFF通报任务进度至|r".."小队") 
+				GameTooltip:AddLine("|cffFFFFFFAnnounce quest progress to|r".." party") 
 				GameTooltip:Show()
 			end)
 			ADDUIQuestCheck:SetScript("OnLeave", function(self)    
@@ -44,7 +44,7 @@ local function OnQuestEvent(event, ...)
         local questID = ...
 		C_Timer.After(0.3,function()
 			if C_QuestLog.IsComplete(questID) then
-				C_ChatInfo.SendChatMessage(GetQuestLink(questID).."任务完成", "PARTY")
+				C_ChatInfo.SendChatMessage(GetQuestLink(questID).." quest complete", "PARTY")
 			end
 		end)
 	end
@@ -59,7 +59,7 @@ local function OnQuestEvent(event, ...)
 		if not C_QuestLog.GetLogIndexForQuestID(questID) then return end
 		local info = C_QuestLog.GetInfo(C_QuestLog.GetLogIndexForQuestID(questID))
         if info and not info.isHeader and (info.isTask or not info.isHidden) then
-			C_ChatInfo.SendChatMessage("接受任务"..GetQuestLink(questID), "PARTY")
+			C_ChatInfo.SendChatMessage("Accepted quest: "..GetQuestLink(questID), "PARTY")
 		end
 	end
 end
@@ -78,14 +78,14 @@ local function OnAutoQuestEvent(event, ...)
 			local ADDUIAutoQuestCheck = CreateFrame("CheckButton", "ADDUIAutoQuestCheck", ObjectiveTrackerFrame.Header,"InterfaceOptionsCheckButtonTemplate")
 			ADDUIAutoQuestCheck:SetPoint("LEFT", ObjectiveTrackerFrame.Header, "LEFT", 150, 0)
 			ADDUIAutoQuestCheck:SetChecked(AddUIDB.AutoQuestCheck)
-			ADDUIAutoQuestCheck.text:SetText("自动交接")
+			ADDUIAutoQuestCheck.text:SetText("Auto Turn-in")
 			ADDUIAutoQuestCheck:SetScale(0.9)
 			ADDUIAutoQuestCheck:SetScript("OnClick", function (self)
 				AddUIDB.AutoQuestCheck = self:GetChecked()
 			end)
 			ADDUIAutoQuestCheck:SetScript("OnEnter",function(self) 
 				GameTooltip:SetOwner(self, "ANCHOR_TOP")
-				GameTooltip:AddLine("|cffFFFFFF按|r".."Ctrl".."|cffFFFFFF或|r".."Shift".."|cffFFFFFF或|r".."Alt".."|cffFFFFFF可以临时关闭|r") 
+				GameTooltip:AddLine("|cffFFFFFFHold|r".." Ctrl".."|cffFFFFFF or|r".." Shift".."|cffFFFFFF or|r".." Alt".."|cffFFFFFF to temporarily disable|r") 
 				GameTooltip:Show()
 			end)
 			ADDUIAutoQuestCheck:SetScript("OnLeave", function(self)    
@@ -96,9 +96,9 @@ local function OnAutoQuestEvent(event, ...)
 
     if not AddUIDB.AutoQuestCheck or IsShiftKeyDown() or IsControlKeyDown() or IsAltKeyDown() then return end
     
-	--来源AutoQuests-2.4.0
-	--https://www.curseforge.com/wow/addons/autoquests-unverz
-	--https://github.com/unverz06/AutoQuests
+	-- Source: AutoQuests-2.4.0
+	-- https://www.curseforge.com/wow/addons/autoquests-unverz
+	-- https://github.com/unverz06/AutoQuests
 	
 	if event=="GOSSIP_SHOW" then
 			local nActive = C_GossipInfo.GetNumActiveQuests()
@@ -176,7 +176,7 @@ local function OnAutoQuestEvent(event, ...)
 	if (event=="QUEST_COMPLETE") then
 		local npcQuestRewardsCount = GetNumQuestChoices()
 		if (npcQuestRewardsCount > 1) then
-			--选择奖励
+			-- Choose reward
 			PlaySound(5274, "master")
 		else
 			GetQuestReward(1)

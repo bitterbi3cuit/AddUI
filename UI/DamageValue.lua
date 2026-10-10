@@ -3,37 +3,44 @@
 local NumberData = {
 	config = CreateAbbreviateConfig({
 		{
-			breakpoint = 1e10,--123亿
-			abbreviation = "亿",
-			significandDivisor = 1e8,
+			breakpoint = 1e10,  -- 10B+, e.g. 12B
+			abbreviation = "B",
+			significandDivisor = 1e9,
 			fractionDivisor = 1,
 			abbreviationIsGlobal = false
 		},
 		{
-			breakpoint = 1e9,--12.3亿
-			abbreviation = "亿",
-			significandDivisor = 1e7,
+			breakpoint = 1e9,   -- 1B+, e.g. 1.2B
+			abbreviation = "B",
+			significandDivisor = 1e8,
 			fractionDivisor = 10,
 			abbreviationIsGlobal = false
 		},
 		{
-			breakpoint = 1e8,--1.23亿
-			abbreviation = "亿",
+			breakpoint = 1e7,   -- 10M+, e.g. 12M
+			abbreviation = "M",
 			significandDivisor = 1e6,
-			fractionDivisor = 100,
-			abbreviationIsGlobal = false
-		},
-		{
-			breakpoint = 1e6,--123万
-			abbreviation = "万",
-			significandDivisor = 1e4,
 			fractionDivisor = 1,
 			abbreviationIsGlobal = false
 		},
 		{
-			breakpoint = 1e4,--1.2万
-			abbreviation = "万",
+			breakpoint = 1e6,   -- 1M+, e.g. 1.2M
+			abbreviation = "M",
+			significandDivisor = 1e5,
+			fractionDivisor = 10,
+			abbreviationIsGlobal = false
+		},
+		{
+			breakpoint = 1e4,   -- 10k+, e.g. 12k
+			abbreviation = "k",
 			significandDivisor = 1e3,
+			fractionDivisor = 1,
+			abbreviationIsGlobal = false
+		},
+		{
+			breakpoint = 1e3,   -- 1k+, e.g. 1.2k
+			abbreviation = "k",
+			significandDivisor = 1e2,
 			fractionDivisor = 10,
 			abbreviationIsGlobal = false
 		},
