@@ -8,12 +8,12 @@ ns.event("PLAYER_LOGIN", function()
 	local height = 30
 	local gap = 1
 
-	-- 打断进度条容器
+	-- Interrupt progress bar container
 	local frame = CreateFrame("Frame", "AddUIInterruptFrame", UIParent)
 	frame:SetPoint("LEFT", 150, 100)
 	frame:SetSize(width, MAX_BARS * (height + gap))
 	frame:Hide()
-	ns.AddEdit(frame,"打断记录")
+	ns.AddEdit(frame,"Interrupt Log")
 
 	local bars = {}
 	for i = 1, MAX_BARS do
@@ -29,15 +29,52 @@ ns.event("PLAYER_LOGIN", function()
 		bar.bg:SetPoint("BOTTOMRIGHT", 1, -1)
 		bar.bg:SetColorTexture(0, 0, 0, 0.7)
 
-		bar.name = bar:CreateFontString(nil, "OVERLAY")
+		bar.name = bar:CreateFontString(nil, "ARTWORK")
 		bar.name:SetPoint("LEFT", 4, 0)
 		bar.name:SetFont(STANDARD_TEXT_FONT, height * 0.6, "OUTLINE")
 
-		bar.time = bar:CreateFontString(nil, "OVERLAY")
+		bar.time = bar:CreateFontString(nil, "ARTWORK")
 		bar.time:SetPoint("RIGHT", -4, 0)
 		bar.time:SetFont(STANDARD_TEXT_FONT, height * 0.6, "OUTLINE")
 
+		bar.mark = bar:CreateTexture(nil, "OVERLAY")
+		bar.mark:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcons")
+		bar.mark:SetSize(height * 0.8, height * 0.8)
+		bar.mark:SetPoint("CENTER", bar, "CENTER", 42, 0)
+		bar.mark:SetDrawLayer("OVERLAY", 7)
+		bar.mark:Hide()
+
+		-- Interrupted spell icon (outside left of the bar)
+		bar.spell = bar:CreateTexture(nil, "ARTWORK")
+		bar.spell:SetSize(height, height)
+		bar.spell:SetPoint("RIGHT", bar, "LEFT", 0, 0)
+		bar.spell:Hide()
+
 		bars[i] = bar
+	end
+
+	-- Left-side raid marker icon: GetRaidTargetIndex returns a tainted value, only a nil check is possible;
+	-- the actual index is handled by SetSpriteSheetCell (secretArguments = AllowedWhenTainted,
+	-- the engine selects the correct cell; the addon does not need to know which marker it is)
+	local function SetMark(bar, index)
+		if index ~= nil then
+			bar.mark:SetSpriteSheetCell(index, 4, 4)
+			bar.mark:Show()
+		else
+			bar.mark:Hide()
+		end
+	end
+
+	-- Icon of the interrupted spell; spellID may be a tainted value,
+	-- passed directly to C_Spell.GetSpellTexture (AllowedWhenTainted)
+	local function SetSpell(bar, spellID)
+		local icon = spellID and C_Spell.GetSpellTexture(spellID)
+		if icon ~= nil then
+			bar.spell:SetTexture(icon)
+			bar.spell:Show()
+		else
+			bar.spell:Hide()
+		end
 	end
 
 	local function Layout()
@@ -65,7 +102,7 @@ ns.event("PLAYER_LOGIN", function()
 				bar.time:SetText(string.format("%d", r))
 				if r >= Max_Time then
 					if bar.preview then
-						-- 预览条走完一轮后重置循环，持续演示计时效果
+						-- After the preview bar completes one cycle, reset and loop to keep demonstrating the timer
 						bar.elapsed = 0
 						bar:SetValue(0)
 						bar.time:SetText("0")
@@ -79,7 +116,8 @@ ns.event("PLAYER_LOGIN", function()
 		if changed then Layout() end
 	end)
 
-	-- interruptedBy 是"打断者"的 GUID；打断引导条时 INTERRUPTED 不触发，只触发 CHANNEL_STOP（interruptedBy ~= nil 即断到）
+	-- interruptedBy is the GUID of the interrupter; when a channeled cast is interrupted,
+	-- UNIT_SPELLCAST_INTERRUPTED does not fire — only CHANNEL_STOP fires (interruptedBy ~= nil means an interrupt occurred)
 	local function OnInterrupt(event, unitTarget, castGUID, spellID, interruptedBy)
 		if not IsInGroup() then return end
 		if not string.match(unitTarget, "nameplate") or interruptedBy == nil then return end
@@ -94,21 +132,23 @@ ns.event("PLAYER_LOGIN", function()
 		local _, classFilename = UnitClassFromGUID(interruptedBy)
 		local color = C_ClassColor.GetClassColor(classFilename)
 		if color then bar:SetStatusBarColor(color.r, color.g, color.b) else bar:SetStatusBarColor(1, 1, 1) end
+		SetMark(bar, GetRaidTargetIndex(unitTarget))
+		SetSpell(bar, spellID)
 		bar.elapsed = 0
 		bar:Show()
 		Layout()
 	end
 
-	ns.event("UNIT_SPELLCAST_INTERRUPTED", OnInterrupt)    -- 普通读条被打断
-	ns.event("UNIT_SPELLCAST_CHANNEL_STOP", OnInterrupt)   -- 引导条被打断
+	ns.event("UNIT_SPELLCAST_INTERRUPTED", OnInterrupt)    -- Normal cast interrupted
+	ns.event("UNIT_SPELLCAST_CHANNEL_STOP", OnInterrupt)   -- Channeled cast interrupted
 
-	-- 编辑模式预览：显示几条假数据条，方便调整位置/大小
+	-- Edit mode preview: shows a few dummy bars to assist with positioning and sizing
 	local previewData = {
-		{ name = "MAGE",     class = "MAGE",        value = 20, color = { r = 0.25, g = 0.78, b = 0.92 } },
-		{ name = "WARRIOR",     class = "WARRIOR",     value = 14, color = { r = 0.78, g = 0.61, b = 0.43 } },
-		{ name = "SHAMAN", class = "SHAMAN",      value = 12, color = { r = 0.00, g = 0.44, b = 0.87 } },
-		{ name = "DEATHKNIGHT", class = "DEATHKNIGHT", value = 12, color = { r = 0.77, g = 0.12, b = 0.23 } },
-		{ name = "PALADIN",   class = "PALADIN",     value = 15, color = { r = 0.96, g = 0.55, b = 0.73 } },
+		{ name = "Mage",         class = "MAGE",        value = 20, color = { r = 0.25, g = 0.78, b = 0.92 }, mark = 8, spell = 133 },
+		{ name = "Warrior",      class = "WARRIOR",     value = 14, color = { r = 0.78, g = 0.61, b = 0.43 }, mark = 1, spell = 5782 },
+		{ name = "Shaman",       class = "SHAMAN",      value = 12, color = { r = 0.00, g = 0.44, b = 0.87 }, spell = 116 },
+		{ name = "Death Knight", class = "DEATHKNIGHT", value = 12, color = { r = 0.77, g = 0.12, b = 0.23 }, mark = 4, spell = 19750 },
+		{ name = "Paladin",      class = "PALADIN",     value = 15, color = { r = 0.96, g = 0.55, b = 0.73 }, spell = 8092 },
 	}
 	local function ShowPreview()
 		for i, data in ipairs(previewData) do
@@ -121,6 +161,8 @@ ns.event("PLAYER_LOGIN", function()
 			bar.name:SetText(data.name)
 			bar:SetStatusBarColor(color.r, color.g, color.b)
 			bar.time:SetText(string.format("%d", data.value))
+			SetMark(bar, data.mark)
+			SetSpell(bar, data.spell)
 			bar:Show()
 		end
 		Layout()
