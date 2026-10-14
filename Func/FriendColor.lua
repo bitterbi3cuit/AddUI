@@ -1,11 +1,12 @@
 ﻿local _,_,_,mygame = GetBuildInfo()
 local _,ns = ...
+
 if SocialUIFrame then
-	ns.tips("Re-layout the friends list card")
+	ns.tips("Friend list card re-layout")
 	ns.hook(FriendsListSocialCardMixin, "Initialize", function(self, node)
 		self:SetHeight(35)
 
-		-- Re-arrange the text: line 1 = FriendName + Name, line 2 = Level Class Location
+		-- Rearrange text: row 1 FriendName Name, row 2 Level Class Location
 		self.FriendName:SetPoint("TOPLEFT", self.TextHolder, "TOPLEFT", 5, 8)
 		self.Name:ClearAllPoints()
 		self.Name:SetPoint("BOTTOMLEFT", self.FriendName, "BOTTOMRIGHT", 4, 0)
@@ -21,7 +22,7 @@ if SocialUIFrame then
 		self.Location:ClearAllPoints()
 		self.Location:SetPoint("TOPLEFT", self.FriendName, "BOTTOMLEFT", 0, -2)
 
-		-- Level, Class and realm all use the Location color (FRIENDS_GRAY_COLOR)
+		-- Level, Class, and realm all use Location's color (FRIENDS_GRAY_COLOR)
 		local gameAccountInfo = self.elementData and self.elementData.accountInfo and self.elementData.accountInfo.gameAccountInfo
 		if gameAccountInfo then
 			local parts = {}
@@ -33,7 +34,7 @@ if SocialUIFrame then
 			end
 		end
 
-		-- Change Name to the class color
+		-- Name changed to class color
 		if gameAccountInfo and gameAccountInfo.characterName and gameAccountInfo.classFilename and gameAccountInfo.classFilename ~= "" then
 			local color = GetClassColorObj(gameAccountInfo.classFilename)
 			if color then
@@ -42,7 +43,7 @@ if SocialUIFrame then
 		end
 	end)
 
-	-- Turn green when an invite is possible, otherwise restore the default
+	-- Turn green when invitable, restore default otherwise
 	ns.hook(FriendsListSocialCardPartyButtonMixin, "RefreshIcon", function(btn)
 		if btn:IsEnabled() and not btn.isInGroup then
 			btn.ActionIcon:SetVertexColor(0,1,0)
@@ -51,7 +52,7 @@ if SocialUIFrame then
 		end
 	end)
 
-	-- Halve the card spacing; works together with SetHeight(35) for the compact layout
+	-- Halve card spacing for compact layout with SetHeight(35)
 	local view = SocialUIFrame and SocialUIFrame.FriendsList
 	if view and view.GetTemplateExtent then
 		local orig = view.GetTemplateExtent
@@ -64,7 +65,7 @@ if SocialUIFrame then
 		end
 	end
 
-	ns.tips("Hide the friends list Battle.net ID; show it on click")
+	ns.tips("Hide friends list Battle.net ID, click to show")
 	local tagFrame = SocialUIFrame.BattleNetBar and SocialUIFrame.BattleNetBar.ControlsContainer and SocialUIFrame.BattleNetBar.ControlsContainer.PersonalBattleTagDisplay
 	if tagFrame and tagFrame.ShowBestDisplayTextAndButton then
 		local hidden = true
@@ -78,13 +79,13 @@ if SocialUIFrame then
 			tagFrame.CopyBattleTagToClipboardButton:SetShown(not hidden)
 		end)
 
-		-- Hide initially
+		-- Initially hidden
 		tagFrame.DisplayText:Hide()
 		tagFrame.CopyBattleTagToClipboardButton:Hide()
 
-		-- Hook Blizzard's show method, and re-hide depending on the hidden state
-		-- Blizzard re-shows it via RefreshElementVisibility -> ShowBestDisplayTextAndButton
-		-- in events such as BN_CONNECTED / PLAYER_ENTERING_WORLD / FRAMES_LOADED
+		-- Hook Blizzard's show method, re-hide based on hidden state
+		-- Blizzard re-shows via BN_CONNECTED/PLAYER_ENTERING_WORLD/FRAMES_LOADED events
+		-- through RefreshElementVisibility → ShowBestDisplayTextAndButton
 		local origShow = tagFrame.ShowBestDisplayTextAndButton
 		tagFrame.ShowBestDisplayTextAndButton = function(self)
 			origShow(self)
@@ -96,8 +97,8 @@ if SocialUIFrame then
 	end
 end
 
--- Can be deleted once 12.1 goes live (superseded by SocialUI)
--- Hide the friends list Battle.net ID; show it on click
+-- Can be removed after 12.1 goes live (replaced by SocialUI)
+-- Hide friends list Battle.net ID, click to show
 local HideBattleIDclick = true
 local HideBattleID = CreateFrame("Button", "HideBattleID", FriendsFrameBattlenetFrame);
 HideBattleID:SetAllPoints(FriendsFrameBattlenetFrame); 
@@ -116,8 +117,12 @@ FriendsFrameBattlenetFrame.Tag:HookScript("OnShow", function(self)
 		self:Hide()
 	end
 end)
-
--- Can be deleted once 12.1 goes live (superseded by SocialUI)
+ns.event("PLAYER_LOGIN", function()
+	if FriendsFrameStatusDropdown then
+		FriendsFrameStatusDropdown:SetWidth(56)
+	end
+end)
+-- Can be removed after 12.1 goes live (replaced by SocialUI)
 ns.hook("FriendsFrame_UpdateFriendButton", function(friendbutton)
 	if not FriendsListFrame or not FriendsListFrame:IsShown() then return end
 	if not friendbutton.id then return end
@@ -125,48 +130,48 @@ ns.hook("FriendsFrame_UpdateFriendButton", function(friendbutton)
 	local info = C_BattleNet.GetFriendAccountInfo(friendbutton.id)
 	if not info then return end
 	local accountInfo = info.gameAccountInfo
-	local areaName = accountInfo.areaName					-- area name
-	local realmDisplayName = accountInfo.realmDisplayName	-- realm
-	local characterName = accountInfo.characterName			-- character name
-	local bnname = Ambiguate(info.battleTag,"short")		-- Battle.net name
-	local level = accountInfo.characterLevel				-- level
-	--local factionName = accountInfo.factionName			-- faction
-	local gamename = accountInfo.wowProjectID				-- game id: 1 = retail, 11 = WotLK
-	local rich = accountInfo.richPresence					-- rich presence returns game version - area - realm
-	local timerunningSeasonID = accountInfo.timerunningSeasonID	-- season ID, used for Remix servers
+	local areaName = accountInfo.areaName	--zone name
+	local realmDisplayName = accountInfo.realmDisplayName	--realm
+	local characterName = accountInfo.characterName --character name
+	local bnname = Ambiguate(info.battleTag,"short")	--Battle.net name
+	local level = accountInfo.characterLevel	--level
+	--local factionName = accountInfo.factionName--faction
+	local gamename = accountInfo.wowProjectID	--game id, 1=retail, 11=wlk
+	local rich = accountInfo.richPresence	--rich presence returns game version-zone-realm
+	local timerunningSeasonID = accountInfo.timerunningSeasonID --season ID for timerunning realms
 
-	-- Title bar (index RAID_CLASS_COLORS directly with the class filename, no iteration needed)
+	-- Name bar (index RAID_CLASS_COLORS directly by classFilename, no iteration needed)
 	local classFilename = accountInfo.classFilename
 	local class = characterName and classFilename and RAID_CLASS_COLORS[classFilename]
 	if class then
 		friendbutton.name:SetText(format("%s|c%s (%s)|r    ", bnname, class.colorStr, characterName))
 	end
 
-	-- Info bar (re-set on every update so Blizzard's default text doesn't overwrite it)
+	-- Info bar (reset on every update to prevent Blizzard default text from overwriting)
 	local infoText
 	if realmDisplayName and areaName and gamename == 1 then
-		if timerunningSeasonID then	-- if on a season server
+		if timerunningSeasonID then--timerunning realm
 			infoText = format("|A:timerunning-glues-icon:12:12:0:0|a%s-%s-%s", areaName, realmDisplayName, level)
 		else
 			infoText = format("%s-%s-%s", areaName, realmDisplayName, level)
 		end
 	elseif areaName and gamename == 14 then
-		local _,fwq = strsplit("-",rich)	-- Classic servers only need the realm name
+		local _,fwq = strsplit("-",rich)	--classic only needs realm name
 		infoText = realmDisplayName and format("CTM-%s-%s-%s", areaName, realmDisplayName, level)
 			or (fwq and format("CTM-%s-%s-%s", areaName, fwq, level) or nil)
 	elseif areaName and gamename == 11 then
-		local _,fwq = strsplit("-",rich)	-- Classic servers only need the realm name
+		local _,fwq = strsplit("-",rich)	--classic only needs realm name
 		infoText = realmDisplayName and format("WLK-%s-%s-%s", areaName, realmDisplayName, level)
 			or (fwq and format("WLK-%s-%s-%s", areaName, fwq, level) or nil)
 	elseif areaName and gamename == 2 then
-		local _,fwq = strsplit("-",rich)	-- Classic servers only need the realm name
-		infoText = realmDisplayName and format("(Classic 60)-%s-%s-%s", areaName, realmDisplayName, level)
-			or (fwq and format("(Classic 60)-%s-%s-%s", areaName, fwq, level) or nil)
+		local _,fwq = strsplit("-",rich)	--classic only needs realm name
+		infoText = realmDisplayName and format("(Classic60)-%s-%s-%s", areaName, realmDisplayName, level)
+			or (fwq and format("(Classic60)-%s-%s-%s", areaName, fwq, level) or nil)
 	end
 	if infoText then
 		friendbutton.info:SetText(infoText)
 	end
-	-- Compare game versions
+	-- Compare game version
 	if mygame > 90000 then
 		if not gamename or gamename == 1 then
 			friendbutton.name:SetAlpha(1)
