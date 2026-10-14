@@ -1,53 +1,58 @@
 local _, ns = ...
 ns.UpdateText = [[
+|cff3cff00## 20261015|r
+* Updated version and added support for 12.1.5
+* Adapted to the appearance of the new action bar buttons and added compatibility for missing controls
+* Adapted to the new action bar button animation style
+* Adapted to the new action bar range indicators and macro text display
+* Adjusted the width of the online-status dropdown in the friends list
+* Fixed Shaman ability icons not refreshing after action bar initialization
+
+|cff3cff00## 20261014|r
+* Updated version number to 20261014
+* When not the group leader, hide the "Your group is forming" cover over the premade-group application list, allowing applicants to be managed directly with right-click
+
+|cff3cff00## 20261013.1|r
+* Updated version number to 20261013.1
+* Fixed right-click whisper and copy-name menus not appearing in the premade-group application list when not the leader or an assistant
+* Fixed the Assassination Rogue DoT grid failing to initialize or display when logging in or reloading in restricted environments such as instances and Mythic+
+
+|cff3cff00## 20261013|r
+* Updated version number to 20261013
+* Added Dwarf Stoneform and Mage Alter Time to the raid-frame damage-reduction monitor, and removed a false positive for shields distributed by Mass Barrier
+* Added target markers and interrupted-spell icons to interrupt records; the Edit Mode preview now shows these as well
+* Fixed the tank's name appearing white in parties (5-player dungeons and Mythic+) for the automatic macro-target setting for Misdirection/Tricks of the Trade
+
 |cff3cff00## 20261010|r
 * Updated version number to 20261010
-* Fixed an issue where mouse-through on region text was not working
+* Fixed mouse clicks passing through area text incorrectly
 
 |cff3cff00## 20261009.1|r
 * Updated version number to 20261009.1
-* Region text mouse-through optimization: tooltips that require manual dismissal retain full mouse interaction; only auto-dismissing tooltips pass through
-* Fixed an issue where, with region text mouse-through enabled, popups with built-in CLOSE buttons (such as the scoreboard) could not be closed
+* Improved mouse click-through for area text: prompts that must be closed manually retain full mouse interaction; only prompts that disappear automatically allow clicks to pass through
+* Fixed popups with built-in CLOSE buttons, such as the scoreboard, being impossible to close when area text allowed clicks to pass through
 
 |cff3cff00## 20261009|r
 * Updated version number to 20261009
-* Renamed the Assassination DOT grid setting to "Monitor only mobs in combat," with a note that this includes mobs currently fighting
-* Fixed an issue where the cancel-aura button, raid frame defensive cooldowns, and self-buff aura countdown numbers would occasionally display very large values
-* Expanded the Assassination DOT grid display range: in addition to mobs you have threat on, mobs currently in combat are also shown; mobs that disappear and lose threat while your DOT is still active will no longer be missed
-* Increased the default Assassination DOT grid cell size from 15 to 20 for better visibility
+* Renamed the Assassination DoT grid setting to "Only monitor enemies in combat" and clarified that it includes enemies currently in combat
+* Fixed countdown numbers occasionally becoming abnormally large on cancel-aura buttons, raid-frame defensive abilities, and personal buff auras
+* Expanded the Assassination DoT grid's display range: it now also shows enemies in combat, not just enemies you have threat on; prevents DoTs from disappearing when an enemy vanishes and clears threat while your DoT is still active
+* Increased the Assassination DoT grid's default cell size from 15 to 20 for better visibility
 
 |cff3cff00## 20261008|r
 * Updated version number to 20261008
-* The damage meter sub-window snap relationship is now automatically restored after a UI reload or login, so you no longer need to re-drag and align it each time
-* Right-click menu WCL link: for instanced content (5-man / M+), clicking it directly shows the current season rating and damage rankings
+* Damage-meter window snapping is now restored automatically after reloading the UI or logging in, so you don't need to reposition it each time
+* Right-click menu WCL links: opening an instance activity (5-player dungeon/Mythic+) now directly displays the current season's score and damage rankings
 
 |cff3cff00## 20261007|r
 * Updated version number to 20261007
-* Optimized bottom info bar gold display: rapid gold changes during trades or mailing no longer repeatedly rebuild the tooltip and text; unified Warband bank label coloring
-* Fixed an issue where the Shaman Nature's Guardian countdown and Thunderstrike icon still appeared when the talent was not learned, and did not restore after unlearning and relearning the talent
-* Added Shroud of the Wisp potion stealth and Supernatural Antidote to the raid frame damage-reduction monitor
+* Improved gold display in the bottom information bar: frequent gold changes during trading or mailing no longer repeatedly rebuild the tooltip and text; also standardized Warband bank tab colors
+* Fixed Shaman Nature's Guardian countdown and Thunderous Paws icon showing when the talents were not learned, and failing to return after switching talents, removing the talent, then learning it again
+* Added the invisible effect of the Potion of Tranquilizing Winds and the Unnatural Anti-Venom to the raid-frame damage-reduction monitor
 
 |cff3cff00## 20261006|r
 * Updated version number to 20261006
-* Added WCL and Raider.IO character page links to the right-click menu for target / party / raid / friends / chat / guild / community / premade group — clicking opens a copyable-URL window that auto-closes; copy character name now copies the full name with realm; NPC right-click can also copy the name; both links can be individually disabled in settings
-
-|cff3cff00## 20261005.1|r
-* Updated version number to 20261005.1
-* Bottom-right info bar gold tooltip now includes a same-account multi-character gold overview, listing each character's gold in class color with Warband bank and total shown; amounts display gold only, no silver or copper
-* Optimized settings panel internals: color swatch buttons no longer re-declare local variables on creation; added comments for the tab-building callback
-
-|cff3cff00## 20261005|r
-* Updated version number to 20261005
-* Added an Assassination Rogue exclusive DOT grid: scans nearby enemy nameplates and turns a cell red when both Garrote and Rupture are applied; supports monitoring only the threat list and a minimum remaining time countdown
-
-|cff3cff00## 20261003|r
-* Updated version number to 20261003
-* Damage meter sub-window now supports drag-to-snap: reference lines show the target position while dragging, and the window automatically aligns to the edge of the previous window on release
-* Added Shroud of Concealment spell ID to the damage-reduction monitor list
-
-|cff3cff00## 20260930|r
-* Updated version number to 20260930
-* Fixed an issue where the icon in the notification message was displayed incorrectly when the Rogue set a Misdirection macro target
+* Added WCL and Raider.IO character-page links to the right-click menus for targets, parties, raids, friends, chat, guilds, communities, and premade groups. Links open in a window with a copyable address and close automatically; copying a character name now copies the full name with realm, and NPC names can also be copied by right-clicking. Each link can be disabled separately in settings
 
 
 ]]
